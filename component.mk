@@ -16,7 +16,7 @@ JERRY_COMPACT_PROFILE ?= 1
 ifeq ($(JERRY_COMPACT_PROFILE),1)
 	COMPONENT_CFLAGS += \
 		-DJERRY_BUILTINS=0 \
-		-DJERRY_ES2015=0 \
+		-DJERRY_ESNEXT=0 \
 		-DJERRY_UNICODE_CASE_CONVERSION=0
 endif
 
@@ -40,6 +40,7 @@ $(JERRY_SNAPSHOT_TOOL):
 	$(Q) $(PYTHON) $(JERRYSCRIPT_ROOT)/tools/build.py \
 		--lto OFF \
 		--jerry-cmdline-snapshot ON \
+		--compile-flag "-D JERRY_ESNEXT=0" \
 		--builddir "$(JERRY_BUILD_DIR)"
 
 jerryscript-clean: jerry-tools-clean

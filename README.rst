@@ -11,7 +11,7 @@ Introduction
 This library allows running JavaScript in a sandbox on all architectures supported by Sming. 
 The library uses JerryScript as JavaScript Virtual Machine (VM).
 
-.. image:: https://github.com/jerryscript-project/jerryscript/raw/master/docs/img/engines_high_level_design.png
+.. image:: jerryscript/docs/img/engines_high_level_design.png
 
 The diagram above shows the interactions between the major components of JerryScript: Parser and VM. 
 Parser performs translation of input ECMAScript application into the byte-code. 
@@ -29,10 +29,10 @@ Samples
 - :sample:`Advanced_Sample` - demonstrates how to modify and compile JavaScript code on the fly using only your browser and run that code on a micro-controller.  
 
 
-JerryScript Version
--------------------
+Version
+-------
 
-Currently we use version v2.2 from JerryScript. If you are interested in updating JerryScript read the :ref:`JerryScriptUpdate` document.
+See :ref:`JerryScriptUpdate` for version information.
 
 
 Configuration variables

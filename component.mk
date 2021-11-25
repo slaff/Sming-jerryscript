@@ -5,6 +5,8 @@ JERRYSCRIPT_ROOT := $(COMPONENT_PATH)/jerryscript
 COMPONENT_SRCDIRS := src $(call ListAllSubDirs,$(JERRYSCRIPT_ROOT)/jerry-core)
 COMPONENT_INCDIRS := src jerryscript $(JERRYSCRIPT_ROOT)/jerry-core $(COMPONENT_SRCDIRS)
 
+COMPONENT_DOCFILES := jerryscript/docs/img/engines_high_level_design.png
+
 # The size of the JerryScript engine heap. The size in kilobytes is allocated once and defined at compile time.
 COMPONENT_VARS := JERRY_GLOBAL_HEAP_SIZE
 JERRY_GLOBAL_HEAP_SIZE ?= 1

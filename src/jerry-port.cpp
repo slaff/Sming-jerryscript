@@ -13,7 +13,8 @@
 #include <sys/time.h>
 
 #include <jerry-core/include/jerryscript-port.h>
-#include <m_printf.h>
+#include <debug_progmem.h>
+#include <Platform/RTC.h>
 
 /**
  * Provide console message implementation for the engine.
@@ -43,25 +44,12 @@ void jerry_port_log(jerry_log_level_t level, /**< log level */
 	va_end(args);
 } /* jerry_port_log */
 
-/** exit - cause normal process termination  */
-void exit(int status)
-{
-	while(true) {
-	}
-} /* exit */
-
 /**
  * Default implementation of jerry_port_get_current_time.
  */
 double jerry_port_get_current_time()
 {
-	struct timeval tv;
-
-	if(gettimeofday(&tv, NULL) != 0) {
-		return 0;
-	}
-
-	return ((double)tv.tv_sec) * 1000.0 + ((double)tv.tv_usec) / 1000.0;
+	return RTC.getRtcNanoseconds() / 1e9;
 } /* jerry_port_get_current_time */
 
 /**
@@ -112,3 +100,25 @@ void jerry_port_fatal(jerry_fatal_code_t code)
 		exit(code);
 	}
 } /* jerry_port_fatal */
+
+/**
+ * Default implementation of jerry_port_track_promise_rejection.
+ * Prints the reason of the unhandled rejections.
+ */
+void jerry_port_track_promise_rejection(const jerry_value_t promise,
+										const jerry_promise_rejection_operation_t operation)
+{
+	(void)operation; /* unused */
+
+	jerry_value_t reason = jerry_get_promise_result(promise);
+	jerry_value_t reason_to_string = jerry_value_to_string(reason);
+	jerry_size_t req_sz = jerry_get_utf8_string_size(reason_to_string);
+	JERRY_VLA(jerry_char_t, str_buf_p, req_sz + 1);
+	jerry_string_to_utf8_char_buffer(reason_to_string, str_buf_p, req_sz);
+	str_buf_p[req_sz] = '\0';
+
+	jerry_release_value(reason_to_string);
+	jerry_release_value(reason);
+
+	jerry_port_log(JERRY_LOG_LEVEL_WARNING, _F("Uncaught (in promise) %s\n"), str_buf_p);
+} /* jerry_port_track_promise_rejection */

@@ -1,6 +1,5 @@
 #include <SmingCore.h>
-#include <jsvm.h>
-#include "JsvmTask.h"
+#include <JsvmTask.h>
 
 namespace
 {

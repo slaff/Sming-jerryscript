@@ -2,8 +2,7 @@
 #include <MultipartParser.h>
 #include <HttpMultipartResource.h>
 #include <Data/Stream/FileStream.h>
-#include <jsvm.h>
-#include "JsvmTask.h"
+#include <JsvmTask.h>
 
 namespace
 {

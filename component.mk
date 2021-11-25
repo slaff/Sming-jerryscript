@@ -2,8 +2,15 @@
 COMPONENT_SUBMODULES := jerryscript
 
 JERRYSCRIPT_ROOT := $(COMPONENT_PATH)/jerryscript
-COMPONENT_SRCDIRS := src $(call ListAllSubDirs,$(JERRYSCRIPT_ROOT)/jerry-core)
-COMPONENT_INCDIRS := src jerryscript $(JERRYSCRIPT_ROOT)/jerry-core $(COMPONENT_SRCDIRS)
+
+COMPONENT_SRCDIRS := \
+	src \
+	$(call ListAllSubDirs,$(JERRYSCRIPT_ROOT)/jerry-core)
+
+COMPONENT_INCDIRS := \
+	src/include jerryscript \
+	$(JERRYSCRIPT_ROOT)/jerry-core \
+	$(COMPONENT_SRCDIRS)
 
 COMPONENT_DOCFILES := jerryscript/docs/img/engines_high_level_design.png
 

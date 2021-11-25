@@ -9,7 +9,7 @@
  * @author Nov 2021 - Slavey Karadzhov <slav@attachix.com>
  */
 
-#include "jsvm.h"
+#include "include/Jsvm.h"
 #include "jsvm-ext.h"
 
 Jsvm::Jsvm(jerry_init_flag_t flags /* =JERRY_INIT_EMPTY */)

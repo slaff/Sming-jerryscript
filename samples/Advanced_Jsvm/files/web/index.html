@@ -35,7 +35,7 @@ function sendData(data) {
   var formData  = new FormData();
 
   // Push our data into our FormData object
-  for(name in data) {
+  for(var name in data) {
     formData.append(name, data[name]);
   }
 

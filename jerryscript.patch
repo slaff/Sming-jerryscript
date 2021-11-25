@@ -119,7 +119,7 @@ index 9b140c76..15466ec1 100755
 +            sys.exit(-1)
 +        if 'EMSCRIPTEN' not in os.environ:
 +            print('No EMSCRIPTEN environment variable set.\n'
-+              'Install the Emscripten SDK from https://kripken.github.io and\n'
++              'Install the Emscripten SDK from https://emscripten.org and\n'
 +              'make sure to `source emsdk_env.sh` before building!', file=sys.stderr)
 +            sys.exit(-1)
 +        emx_root = os.environ['EMSCRIPTEN']

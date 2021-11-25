@@ -29,8 +29,9 @@ set(EMCC_LINK_FLAGS
         "-s ERROR_ON_UNDEFINED_SYMBOLS=1"
         "-s SAFE_HEAP=1"
         "-s EXPORTED_FUNCTIONS=\"['_emscripten_snapshot_compiler_get_version', '_emscripten_snapshot_compiler_compile']\""
-        "-s EXTRA_EXPORTED_RUNTIME_METHODS=\"['cwrap']\""
-        "-g4"
+        "-s EXPORTED_RUNTIME_METHODS=\"['cwrap']\""
+        "-gsource-map"
+        "--no-entry"
         "--memory-init-file 0"
         "-s STANDALONE_WASM=1")
 

@@ -54,8 +54,14 @@ Configuration variables
     default: ``out/jerryscript``
 
     Location to write generated .snap files.
-    
-    
+
+.. envvar:: APP_JS_SNAP_UPDATED
+
+    default: undefined
+
+    Set this if action required when snaps are updated, for example to rebuild SPIFFS image or update application.
+
+
 Credits
 -------
 

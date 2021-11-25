@@ -49,8 +49,7 @@ void onTask(HttpRequest& request, HttpResponse& response)
 	if(runTask == "0") {
 		body = F("{\"status\": \"stopped\"}");
 		jsTask.suspend();
-	}
-	else {
+	} else {
 		body = F("{\"status\": \"running\"}");
 		jsTask.resume();
 	}

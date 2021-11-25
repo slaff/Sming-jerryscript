@@ -1,8 +1,12 @@
-/*
- * jsvm-ext.h
+/****
+ * Sming Framework Project - Open Source framework for high efficiency native ESP8266 development.
+ * Created 2015 by Skurydin Alexey
+ * http://github.com/SmingHub/Sming
+ * All files of the Sming Core are provided under the LGPL v3 license.
  *
- *  Created on: Feb 11, 2016
- *      Author: slavey
+ * jsvm-ext.cpp
+ *
+ * @author Nov 2021 - Slavey Karadzhov <slav@attachix.com>
  */
 
 #pragma once

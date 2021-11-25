@@ -41,6 +41,10 @@ RUN echo "deb http://apt.llvm.org/xenial/   llvm-toolchain-xenial-9  main" > /et
     update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-9 1 && \
     update-alternatives --install /usr/bin/wasm-ld wasm-ld /usr/bin/wasm-ld-9 1 && \
     update-alternatives --install /usr/bin/llc llc-9 /usr/bin/llc-9 1
+    
+# Clean apt cache
+RUN apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Installing WebAssembly Toolkit
 RUN cd / && \

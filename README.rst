@@ -5,49 +5,34 @@ JerryScript
 
 A JavaScript Virtual Machine based on JerryScript.
 
-Status
-------
+Introduction
+------------
 
-Currently we use version v2.2 from JerryScript
+This library allows running JavaScript in a sandbox on all architectures supported by Sming. 
+The library uses JerryScript as JavaScript Virtual Machine (VM).
 
-Update
-------
+.. image:: https://github.com/jerryscript-project/jerryscript/raw/master/docs/img/engines_high_level_design.png
 
-In order to update the version of JerryScript two tasks have to be executed:
+The diagram above shows the interactions between the major components of JerryScript: Parser and VM. 
+Parser performs translation of input ECMAScript application into the byte-code. 
+Prepared bytecode is executed by the Virtual Machine that performs interpretation.
+Source:  `Official JerryScript site <https://github.com/jerryscript-project/jerryscript/blob/master/docs/04.INTERNALS.md>`_. 
 
-- in this repository to update the submodule version of JerryScript to point to the new version
-- in https://github.com/attachix/jerryscript repository that same version has to be merged too.
+To save space and be able to run JerryScript on an embedded device Sming compiles this library without a parser.
+This means that the JavaScript files have to be compiled before landing on the device.
+See the samples below to learn more.
 
-Once that is done we need to build completely from scratch a new docker container.
+Samples
+-------
 
-Dockerfile
-----------
+- :sample:`Basic_Sample` - demonstrates how to use JerryScript and run compiled JavaScript code on a micro-controller.
+- :sample:`Advanced_Sample` - demonstrates how to modify and compile JavaScript code on the fly using only your browser and run that code on a micro-controller.  
 
-Up to now we have good results with creating a pure JavaScript code using the latest sdk.
-There is a docker container that creates the needed environment.
-It can be built and run with the following commands::
 
-    docker build -f components/jerryscript/Dockerfile -t jerryscript-ems .
-    docker run -it jerryscript-ems
+JerryScript Version
+-------------------
 
-Inside the container a new jerryscript snapshot compiler can be built by calling::
-
-    node /jerryscript/build/bin/jsc.js -o /tmp/test.js.snap /tmp/test.js
-
-Where ``test.js.snap`` is the output file and ``/tmp/test.js`` is an existing JavaScript file.
-
-To update the already precompiled jsc.js in ``web/dev`` you can do the following::
-
-    docker run -v $(pwd)/web/:/web -it jerryscript-ems
-
-And run the following commands inside the container::
-
-    cp -r /jerryscript/build/bin/jsc.* /web/dev
-
-That will require also precompilation of the main.js file.
-Inside the container this can be done with the following command::
-
-    node /jerryscript/build/bin/jsc.js -o /web/build/main.js.snap /web/dev/main.js
+Currently we use version v2.2 from JerryScript. If you are interested in updating JerryScript read the :ref:`JerryScriptUpdate` document.
 
 
 Configuration variables
@@ -69,3 +54,10 @@ Configuration variables
     default: ``out/jerryscript``
 
     Location to write generated .snap files.
+    
+    
+Credits
+-------
+
+The initial work on the JerryScript library for Sming was done as part of the `U:Kit project <https://github.com/attachix/ukit>`_. 
+ 

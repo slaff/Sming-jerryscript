@@ -33,8 +33,6 @@ jerry_value_t printFunction (const jerry_value_t function_obj,
 
 	  static const char *null_str = "\\u0000";
 	  jerry_length_t arg_index = 0;
-	  jerry_size_t chr_index = 0;
-	  jerry_size_t null_index = 0;
 
 	  jerry_value_t ret_val = jerry_create_undefined ();
 
@@ -61,12 +59,12 @@ jerry_value_t printFunction (const jerry_value_t function_obj,
 	                                                            substr_buf,
 	                                                            256)) != 0)
 	      {
-	        for (chr_index = 0; chr_index < substr_size; chr_index++)
+	        for (jerry_size_t chr_index = 0; chr_index < substr_size; chr_index++)
 	        {
 	          char chr = (char) substr_buf[chr_index];
 	          if (chr == '\0')
 	          {
-	            for (null_index = 0; null_str[null_index] != 0; null_index++)
+	            for (jerry_size_t null_index = 0; null_str[null_index] != 0; null_index++)
 	            {
 	              jerryx_port_handler_print_char (null_str[null_index]);
 	            }

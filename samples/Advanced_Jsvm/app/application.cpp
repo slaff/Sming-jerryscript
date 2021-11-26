@@ -2,8 +2,12 @@
 #include <MultipartParser.h>
 #include <HttpMultipartResource.h>
 #include <Data/Stream/FileStream.h>
-#include <jsvm.h>
-#include "JsvmTask.h"
+#include <JsvmTask.h>
+
+#ifndef WIFI_SSID
+#define WIFI_SSID "PleaseEnterSSID"
+#define WIFI_PWD "PleaseEnterPass"
+#endif
 
 namespace
 {
@@ -54,19 +58,17 @@ void onTask(HttpRequest& request, HttpResponse& response)
 		jsTask.resume();
 	}
 
-	response.headers[HTTP_HEADER_CONTENT_TYPE] = "application/json";
+	response.headers[HTTP_HEADER_CONTENT_TYPE] = toString(MIME_JSON);
 	response.sendString(body);
 }
 
 void onFile(HttpRequest& request, HttpResponse& response)
 {
-	String file = request.uri.Path;
-	if(file[0] == '/')
-		file = file.substring(1);
+	String file = request.uri.getRelativePath();
 
-	if(file[0] == '.')
+	if(file[0] == '.') {
 		response.code = HTTP_STATUS_FORBIDDEN;
-	else {
+	} else {
 		response.setCache(86400, true);
 		response.sendFile(file);
 	}
@@ -75,7 +77,7 @@ void onFile(HttpRequest& request, HttpResponse& response)
 void onWasm(HttpRequest& request, HttpResponse& response)
 {
 	onFile(request, response);
-	response.headers[HTTP_HEADER_CONTENT_TYPE] = "application/wasm";
+	response.headers[HTTP_HEADER_CONTENT_TYPE] = F("application/wasm");
 }
 
 void fileUploadMapper(HttpFiles& files)
@@ -90,7 +92,7 @@ int onUpload(HttpServerConnection& connection, HttpRequest& request, HttpRespons
 		body = F("{\"status\": \"ok\"}");
 		jsTask.suspend();
 	}
-	response.headers[HTTP_HEADER_CONTENT_TYPE] = "application/json";
+	response.headers[HTTP_HEADER_CONTENT_TYPE] = toString(MIME_JSON);
 	response.sendString(body);
 
 	startJsvm();
@@ -105,8 +107,8 @@ void startWebServer()
 	webServer.paths.set("/", onIndex);
 	webServer.paths.set("/task", onTask);
 
-	HttpMultipartResource* uploadResouce = new HttpMultipartResource(fileUploadMapper, onUpload);
-	webServer.paths.set("/update", uploadResouce);
+	auto uploadResource = new HttpMultipartResource(fileUploadMapper, onUpload);
+	webServer.paths.set("/update", uploadResource);
 	webServer.paths.set("/jsc.wasm", onWasm);
 
 	webServer.paths.setDefault(onFile);
@@ -123,9 +125,13 @@ void init()
 
 	// Mount file system, in order to work with files
 	if(!spiffs_mount()) {
-		Serial.println("Unable to mount the spiffs file system!");
+		Serial.println(_F("Unable to mount the spiffs file system!"));
 		return;
 	}
+
+	// Station - WiFi client
+	WifiStation.enable(true);
+	WifiStation.config(_F(WIFI_SSID), _F(WIFI_PWD));
 
 	System.onReady(startWebServer);
 }

@@ -1,4 +1,4 @@
 [submodule "Libraries.jerryscript"]
 	path = jerryscript
-	url = https://github.com/attachix/jerryscript.git
+	url = https://github.com/jerryscript-project/jerryscript
 	ignore = dirty

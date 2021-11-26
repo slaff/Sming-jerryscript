@@ -1,29 +1,28 @@
-JerryScript Update
-==================
+Updating JerryScript
+====================
 
-JerryScript Version
--------------------
+Currently we use Jerryscript version v2.4 from `JerryScript <https://github.com/jerryscript-project/jerryscript>`__.
 
-Currently we use version v2.2 from JerryScript
+The code is imported as a submodule and patched to support Web-based javascript compilation (see https://emscripten.org/).
 
 Update
-~~~~~~
+------
 
 In order to update the version of JerryScript two tasks have to be executed:
 
-- in this repository update the submodule version of JerryScript to point to the new version
-- merge the changes to the https://github.com/attachix/jerryscript repository
+- In this repository update the submodule version of JerryScript to point to the new version
+- Update patch files as necessary
 
 Once that is done we need to build completely from scratch a new docker container.
 
 Dockerfile
-~~~~~~~~~~
+----------
 
 Up to now we have good results with creating a pure JavaScript code using the latest sdk.
 There is a docker container that creates the needed environment.
 It can be built and run with the following commands::
 
-    docker build -f components/jerryscript/Dockerfile -t jerryscript-ems .
+    docker build -f Dockerfile -t jerryscript-ems .
     docker run -it jerryscript-ems
 
 Inside the container a new jerryscript snapshot compiler can be built by calling::

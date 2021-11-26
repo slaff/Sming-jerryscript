@@ -22,7 +22,7 @@ Up to now we have good results with creating a pure JavaScript code using the la
 There is a docker container that creates the needed environment.
 It can be built and run with the following commands::
 
-    docker build -f components/jerryscript/Dockerfile -t jerryscript-ems .
+    docker build -f Dockerfile -t jerryscript-ems .
     docker run -it jerryscript-ems
 
 Inside the container a new jerryscript snapshot compiler can be built by calling::

@@ -1,13 +1,20 @@
-FROM ubuntu:16.04
+FROM ubuntu
 
-RUN apt-get update -q
-RUN apt-get -q -y install \
+RUN apt-get -y update -q \
+    && DEBIAN_FRONTEND=noninteractive \
+    TZ=Europe/London \
+    apt-get -q -y install \
+    tzdata \
     cmake \
+    ninja-build \
+    clang \
     default-jre \
     git-core \
-    python \
-    python-pip \
-    sudo
+    python3 \
+    python3-pip \
+    sudo && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN pip install pylint==1.6.5
 
@@ -22,34 +29,32 @@ RUN git clone https://github.com/emscripten-core/emsdk.git && \
 
 SHELL ["/bin/bash", "-c"]
 
-RUN git clone -b feature/emscripten-jerryscript-v2 https://github.com/attachix/jerryscript
+ENV SMING_HOME /sming/Sming
+ENV SMING_SOC host
+ENV JERRY_HOME $SMING_HOME/Libraries/jerryscript
 
-WORKDIR /jerryscript
+ARG JERRY_REPO=https://github.com/slaff/Sming-jerryscript
+ARG JERRY_BRANCH=master
+
+RUN git clone --depth 1 https://github.com/SmingHub/Sming /sming && \
+    /sming/Tools/install.sh host && \
+    rm -rf $JERRY_HOME && \
+    git clone -b $JERRY_BRANCH $JERRY_REPO $JERRY_HOME && \
+    touch $JERRY_HOME/.submodule && \
+    ln -s $JERRY_HOME/jerryscript /jerryscript && \
+    make -C $JERRY_HOME/samples/Basic_Jsvm ../../jerryscript/.submodule
+
+WORKDIR $SMING_HOME/Libraries/jerryscript
 
 ENV EMSCRIPTEN /emsdk/upstream/emscripten
 
-RUN source /emsdk/emsdk_env.sh && ./tools/build.py --emscripten-snapshot-compiler ON --verbose --profile=minimal
-
-# Install Clang-9
-ENV LLVM_VERSION 9
-RUN echo "deb http://apt.llvm.org/xenial/   llvm-toolchain-xenial-9  main" > /etc/apt/sources.list.d/llvm.list && \
-    apt-get install -y wget && \
-    wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
-    apt-get update && \
-    apt-get install -y clang-$LLVM_VERSION lldb-$LLVM_VERSION lld-$LLVM_VERSION clangd-$LLVM_VERSION && \
-    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-9 1 && \
-    update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-9 1 && \
-    update-alternatives --install /usr/bin/wasm-ld wasm-ld /usr/bin/wasm-ld-9 1 && \
-    update-alternatives --install /usr/bin/llc llc-9 /usr/bin/llc-9 1
-    
-# Clean apt cache
-RUN apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN source /emsdk/emsdk_env.sh && \
+    python3 /jerryscript/tools/build.py --emscripten-snapshot-compiler ON --verbose --profile=minimal
 
 # Installing WebAssembly Toolkit
 RUN cd / && \
-     git clone --recursive https://github.com/WebAssembly/wabt && \
-     make -C wabt -j$(nproc)
+    git clone --recursive https://github.com/WebAssembly/wabt && \
+    make -C wabt -j$(nproc)
 
 ENV PATH=$PATH:/wabt/bin
 

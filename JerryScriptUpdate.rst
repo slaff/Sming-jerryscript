@@ -1,9 +1,12 @@
 Updating JerryScript
 ====================
 
-Currently we use Jerryscript version v2.4 from `JerryScript <https://github.com/jerryscript-project/jerryscript>`__.
+highlight:: bash
 
-The code is imported as a submodule and patched to support Web-based javascript compilation (see https://emscripten.org/).
+Currently we use Jerryscript version v2.4 from `JerryScript <https://github.com/jerryscript-project/jerryscript>`__,
+imported as a submodule.
+
+The `web-assembly (WASM) <https://webassembly.org/>`__ snapshot compiler uses the `emscripten SDK <https://emscripten.org/>`__.
 
 Update
 ------
@@ -11,15 +14,31 @@ Update
 In order to update the version of JerryScript two tasks have to be executed:
 
 - In this repository update the submodule version of JerryScript to point to the new version
-- Update patch files as necessary
+- Rebuild the snapshot compiler
 
-Once that is done we need to build completely from scratch a new docker container.
+The snapshot compiler can be rebuilt manually as follows:
+
+1. Install the emscripten SDK::
+
+    git clone --depth 1 https://github.com/emscripten-core/emsdk.git emsdk
+    emsdk/emsdk install latest
+    emsdk/emsdk activate latest
+
+2. run ``make`` from the ``emscripten-snapshot-compiler`` directory.
+
+The following three files are generated in ``emscripten-snapshot-compiler/build/bin/{PROFILE}``:
+
+- jsc.js
+- jsc.wasm
+- jsc.wasm.map
+
+Copy these to the ``jsc`` sub-directory for application use as demonstrated in the ``Advanced_Jsvm`` sample.
+
 
 Dockerfile
 ----------
 
-Up to now we have good results with creating a pure JavaScript code using the latest sdk.
-There is a docker container that creates the needed environment.
+The snapshot compiler can be rebuilt using a Docker container which also includes a WebAssembly toolkit.
 It can be built and run with the following commands::
 
     docker build -f Dockerfile -t jerryscript-ems .
@@ -27,20 +46,19 @@ It can be built and run with the following commands::
 
 Inside the container a new jerryscript snapshot compiler can be built by calling::
 
-    node /jerryscript/build/bin/jsc.js -o /tmp/test.js.snap /tmp/test.js
+    node /jerryscript/build/bin/minimal/jsc.js -o /tmp/test.js.snap /tmp/test.js
 
 Where ``test.js.snap`` is the output file and ``/tmp/test.js`` is an existing JavaScript file.
 
-To update the already precompiled jsc.js in ``web/dev`` you can do the following::
+To update the ``jsc.*`` files you run the following from the application directory::
 
-    docker run -v $(pwd)/web/:/web -it jerryscript-ems
+    docker run -v $(pwd)/files/web/:/web -it jerryscript-ems
 
 And run the following commands inside the container::
 
-    cp -r /jerryscript/build/bin/jsc.* /web/dev
+    cp -r /jerryscript/build/bin/minimal/jsc.* /web
 
-That will require also precompilation of the main.js file.
-Inside the container this can be done with the following command::
+The build system handles compilation of the ``main.js`` file,
+but if you prefer to use pre-compiled snaps this can also be done inside the container::
 
-    node /jerryscript/build/bin/jsc.js -o /web/build/main.js.snap /web/dev/main.js
-
+    node /jerryscript/build/bin/minimal/jsc.js -o /web/main.js.snap /web/main.js

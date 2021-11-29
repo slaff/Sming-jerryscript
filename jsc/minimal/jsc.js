@@ -1206,10 +1206,10 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 11296: function() {
+ 11440: function() {
   throw new Error("Input must be valid UTF-8");
  },
- 11347: function($0) {
+ 11491: function($0) {
   throw new Error(UTF8ToString($0));
  }
 };
@@ -1395,6 +1395,7 @@ var asmLibraryArg = {
  "invoke_iiiii": invoke_iiiii,
  "invoke_vi": invoke_vi,
  "invoke_vii": invoke_vii,
+ "invoke_viii": invoke_viii,
  "invoke_viiiii": invoke_viiiii,
  "proc_exit": _proc_exit,
  "segfault": segfault,
@@ -1417,6 +1418,10 @@ var _malloc = Module["_malloc"] = function() {
 
 var _free = Module["_free"] = function() {
  return (_free = Module["_free"] = Module["asm"]["free"]).apply(null, arguments);
+};
+
+var _saveSetjmp = Module["_saveSetjmp"] = function() {
+ return (_saveSetjmp = Module["_saveSetjmp"] = Module["asm"]["saveSetjmp"]).apply(null, arguments);
 };
 
 var __initialize = Module["__initialize"] = function() {
@@ -1455,10 +1460,6 @@ var _emscripten_stack_get_base = Module["_emscripten_stack_get_base"] = function
  return (_emscripten_stack_get_base = Module["_emscripten_stack_get_base"] = Module["asm"]["emscripten_stack_get_base"]).apply(null, arguments);
 };
 
-var _saveSetjmp = Module["_saveSetjmp"] = function() {
- return (_saveSetjmp = Module["_saveSetjmp"] = Module["asm"]["saveSetjmp"]).apply(null, arguments);
-};
-
 var _setThrew = Module["_setThrew"] = function() {
  return (_setThrew = Module["_setThrew"] = Module["asm"]["setThrew"]).apply(null, arguments);
 };
@@ -1475,6 +1476,17 @@ function invoke_vi(index, a1) {
  var sp = stackSave();
  try {
   getWasmTableEntry(index)(a1);
+ } catch (e) {
+  stackRestore(sp);
+  if (e !== e + 0 && e !== "longjmp") throw e;
+  _setThrew(1, 0);
+ }
+}
+
+function invoke_viii(index, a1, a2, a3) {
+ var sp = stackSave();
+ try {
+  getWasmTableEntry(index)(a1, a2, a3);
  } catch (e) {
   stackRestore(sp);
   if (e !== e + 0 && e !== "longjmp") throw e;

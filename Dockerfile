@@ -19,37 +19,26 @@ RUN apt-get -y update -q \
 RUN pip install pylint==1.6.5
 
 ENV SDK_VERSION latest
+ENV EMSDK /emsdk
 
 # [Activate last working version ]
-RUN git clone https://github.com/emscripten-core/emsdk.git && \
-    cd emsdk && \
-    ./emsdk install $SDK_VERSION && \
-    ./emsdk activate $SDK_VERSION && \
-    /bin/bash -c "source ./emsdk_env.sh"
+RUN git clone --depth 1 https://github.com/emscripten-core/emsdk.git $EMSDK && \
+    $EMSDK/emsdk install $SDK_VERSION && \
+    $EMSDK/emsdk activate $SDK_VERSION
 
 SHELL ["/bin/bash", "-c"]
 
-ENV SMING_HOME /sming/Sming
-ENV SMING_SOC host
-ENV JERRY_HOME $SMING_HOME/Libraries/jerryscript
+ENV JERRY_HOME /jerryscript
 
 ARG JERRY_REPO=https://github.com/slaff/Sming-jerryscript
 ARG JERRY_BRANCH=master
 
-RUN git clone --depth 1 https://github.com/SmingHub/Sming /sming && \
-    /sming/Tools/install.sh host && \
-    rm -rf $JERRY_HOME && \
-    git clone -b $JERRY_BRANCH $JERRY_REPO $JERRY_HOME && \
-    touch $JERRY_HOME/.submodule && \
-    ln -s $JERRY_HOME/jerryscript /jerryscript && \
-    make -C $JERRY_HOME/samples/Basic_Jsvm ../../jerryscript/.submodule
+RUN git clone --depth 1 -b $JERRY_BRANCH $JERRY_REPO $JERRY_HOME --recurse-submodules
 
-WORKDIR $SMING_HOME/Libraries/jerryscript
+WORKDIR $JERRY_HOME
 
-ENV EMSCRIPTEN /emsdk/upstream/emscripten
-
-RUN source /emsdk/emsdk_env.sh && \
-    python3 /jerryscript/tools/build.py --emscripten-snapshot-compiler ON --verbose --profile=minimal
+RUN source $EMSDK/emsdk_env.sh && \
+    make -C emscripten-snapshot-compiler
 
 # Installing WebAssembly Toolkit
 RUN cd / && \
@@ -58,5 +47,5 @@ RUN cd / && \
 
 ENV PATH=$PATH:/wabt/bin
 
-ENTRYPOINT source /emsdk/emsdk_env.sh && /bin/bash
-CMD ["node","/jerryscript/build/bin/jsc.js"]
+ENTRYPOINT source $EMSDK/emsdk_env.sh && /bin/bash
+CMD ["node","$JERRY_HOME/emscripten-snapshot-compiler/build/bin/minimal/jsc.js"]

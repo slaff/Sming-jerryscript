@@ -26,13 +26,13 @@ The snapshot compiler can be rebuilt manually as follows:
 
 2. run ``make`` from the ``emscripten-snapshot-compiler`` directory.
 
-The following three files are generated in ``emscripten-snapshot-compiler/build/bin``:
+The following three files are generated in ``emscripten-snapshot-compiler/build/bin/{PROFILE}``:
 
 - jsc.js
 - jsc.wasm
 - jsc.wasm.map
 
-These should be deployed in the applications as demonstrated in the ``Advanced_Jsvm`` sample.
+Copy these to the ``jsc`` sub-directory for application use as demonstrated in the ``Advanced_Jsvm`` sample.
 
 
 Dockerfile
@@ -46,7 +46,7 @@ It can be built and run with the following commands::
 
 Inside the container a new jerryscript snapshot compiler can be built by calling::
 
-    node /jerryscript/build/bin/jsc.js -o /tmp/test.js.snap /tmp/test.js
+    node /jerryscript/build/bin/minimal/jsc.js -o /tmp/test.js.snap /tmp/test.js
 
 Where ``test.js.snap`` is the output file and ``/tmp/test.js`` is an existing JavaScript file.
 
@@ -56,9 +56,9 @@ To update the ``jsc.*`` files you run the following from the application directo
 
 And run the following commands inside the container::
 
-    cp -r /jerryscript/build/bin/jsc.* /web
+    cp -r /jerryscript/build/bin/minimal/jsc.* /web
 
 The build system handles compilation of the ``main.js`` file,
 but if you prefer to use pre-compiled snaps this can also be done inside the container::
 
-    node /jerryscript/build/bin/jsc.js -o /web/main.js.snap /web/main.js
+    node /jerryscript/build/bin/minimal/jsc.js -o /web/main.js.snap /web/main.js

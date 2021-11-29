@@ -14,7 +14,8 @@ GZIP:= gzip
 ##@Web Tools
 
 .PHONY: web-build
-web-build: $(SPIFF_FILES)##Create new build
+web-build: $(SPIFF_FILES) ##Create new build
+	$(Q) cp $(JERRY_WEB_COMPILER)/* $</
 	$(Q) cp -r $(APP_JS_SOURCE_DIR)/*.js  $</
 	$(Q) cp -r $(DEV_FILES)/* $</
 	$(Q) if command -v $(GZIP) &> /dev/null; then \
@@ -24,4 +25,4 @@ web-build: $(SPIFF_FILES)##Create new build
 
 .PHONY: web-build-clean	    
 web-build-clean:##Clean the build directory
-	$(Q) rm -rf $(SPIFF_FILES)	    
+	$(Q) rm -rf $(SPIFF_FILES)

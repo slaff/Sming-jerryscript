@@ -38,7 +38,7 @@ RUN git clone --depth 1 -b $JERRY_BRANCH $JERRY_REPO $JERRY_HOME --recurse-submo
 WORKDIR $JERRY_HOME
 
 RUN source $EMSDK/emsdk_env.sh && \
-    make -C emscripten-snapshot-compiler JERRY_PROFILE=minimal
+    make -C emscripten-snapshot-compiler
 
 # Installing WebAssembly Toolkit
 RUN cd / && \
@@ -48,4 +48,4 @@ RUN cd / && \
 ENV PATH=$PATH:/wabt/bin
 
 ENTRYPOINT source $EMSDK/emsdk_env.sh && /bin/bash
-CMD ["node","$JERRY_HOME/emscripten-snapshot-compiler/build/bin/jsc.js"]
+CMD ["node","$JERRY_HOME/emscripten-snapshot-compiler/build/bin/minimal/jsc.js"]

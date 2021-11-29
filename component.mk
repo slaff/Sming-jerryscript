@@ -18,11 +18,12 @@ COMPONENT_DOCFILES := jerryscript/docs/img/engines_high_level_design.png
 COMPONENT_VARS := JERRY_GLOBAL_HEAP_SIZE
 JERRY_GLOBAL_HEAP_SIZE ?= 1
 
-# Compact compilation profile makes the JerryScript library smaller
-COMPONENT_VARS += JERRY_COMPACT_PROFILE  
+# Compact (minimal profile) compilation profile makes the JerryScript library smaller
+COMPONENT_VARS += JERRY_COMPACT_PROFILE
 JERRY_COMPACT_PROFILE ?= 1
 
 ifeq ($(JERRY_COMPACT_PROFILE),1)
+JERRY_PROFILE := minimal
 # Apply these flags to library and tool(s)
 JERRY_COMPILER_FLAGS := \
 	JERRY_BUILTINS=0 \
@@ -31,7 +32,11 @@ JERRY_COMPILER_FLAGS := \
 # Just for library
 COMPONENT_CFLAGS += \
 	-DJERRY_NUMBER_TYPE_FLOAT64=0
+else
+JERRY_PROFILE := es.next
 endif
+
+JERRY_WEB_COMPILER := $(COMPONENT_PATH)/jsc/$(JERRY_PROFILE)
 
 COMPONENT_CFLAGS += \
 	-DJERRY_GLOBAL_HEAP_SIZE=$(JERRY_GLOBAL_HEAP_SIZE) \

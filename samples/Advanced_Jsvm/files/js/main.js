@@ -5,7 +5,11 @@ var x;
  */
 function setup() {
 	x = 0;
-	print ('Setup: X='+x);
+	print('Setup: X=' + x);
+
+	addEventListener("EVENT_TEMP", function(event) {
+		print('Event name: ' + event.name + ', value: '	+ event.params['temp']);
+	});
 }
 
 /**
@@ -13,5 +17,5 @@ function setup() {
  */
 function loop() {
 	x++;
-	print('Loop: X='+x);
+	print('Loop: X=' + x);
 }

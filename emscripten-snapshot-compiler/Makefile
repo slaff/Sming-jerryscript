@@ -40,6 +40,7 @@ build:
 		--lto OFF \
 		--strip OFF \
 		--profile $(JERRY_PROFILE) \
+		--compile-flag "-Wno-implicit-int-float-conversion " \
 		--builddir $(BUILD_DIR)/jerryscript
 	mkdir -p $(BUILD_DIR)
 	cmake --verbose -DCMAKE_BUILD_TYPE=MinSizeRel -DJERRY_PROFILE=$(JERRY_PROFILE) -S . -B $(BUILD_DIR)

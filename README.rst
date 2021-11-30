@@ -55,6 +55,12 @@ Configuration variables
 
     Set this if action required when snaps are updated, for example to rebuild SPIFFS image or update application.
 
+.. envvar:: JERRY_WEB_COMPILER
+
+    (read-only)
+
+    Location of pre-compiled web compiler. See ``Advanced-Jsvm`` sample for example usage.
+
 
 Credits
 -------

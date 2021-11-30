@@ -127,7 +127,7 @@ void startWebServer()
 		JsEventData params;
 		params["temp"]="20";
 		triggerEvent("EVENT_TEMP", params);
-	})).start();
+	})).startOnce();
 }
 
 } // namespace

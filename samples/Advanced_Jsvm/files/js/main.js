@@ -1,5 +1,11 @@
 var x;
 
+
+function thirdListener(event)
+{
+	print('Third listener');
+}
+
 /**
  * This is a function that will be called once.
  */
@@ -10,6 +16,12 @@ function setup() {
 	addEventListener("EVENT_TEMP", function(event) {
 		print('Event name: ' + event.name + ', value: '	+ event.params['temp']);
 	});
+	
+//	addEventListener("EVENT_TEMP", function(event) {
+//		print('Second listner');
+//	});
+//	
+//	addEventListener("EVENT_TEMP", thirdListener);
 }
 
 /**

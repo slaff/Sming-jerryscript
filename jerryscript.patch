@@ -1,0 +1,12 @@
+diff --git a/jerry-core/parser/js/js-parser.c b/jerry-core/parser/js/js-parser.c
+index 88347f8e..05629a10 100644
+--- a/jerry-core/parser/js/js-parser.c
++++ b/jerry-core/parser/js/js-parser.c
+@@ -2900,7 +2900,6 @@ parser_parse_script (const uint8_t *arg_list_p, /**< function argument list */
+   JERRY_UNUSED (source_p);
+   JERRY_UNUSED (source_size);
+   JERRY_UNUSED (parse_opts);
+-  JERRY_UNUSED (resource_name);
+ 
+   ecma_raise_syntax_error (ECMA_ERR_MSG ("Source code parsing is disabled"));
+   return NULL;

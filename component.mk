@@ -39,6 +39,7 @@ endif
 JERRY_WEB_COMPILER := $(COMPONENT_PATH)/jsc/$(JERRY_PROFILE)
 
 COMPONENT_CFLAGS += \
+	-Wno-error=unused-function \
 	-DJERRY_GLOBAL_HEAP_SIZE=$(JERRY_GLOBAL_HEAP_SIZE) \
 	-DJERRY_LCACHE=0  \
 	-DJERRY_PARSER=0 \
@@ -55,9 +56,9 @@ ifeq ($(UNAME),Windows)
 JERRY_CMAKE_PARAMS := \
 	--cmake-param "-GMSYS Makefiles" \
 	--compile-flag "-I $(JERRYSCRIPT_ROOT)/../src/include" \
-	-v \
 	--compile-flag "-std=gnu11 " \
-	--compile-flag "-D\"_splitpath_s(a,b,c,d,e,f,g,h,i)\"=\"_splitpath(a,b,d,f,h)\" "
+	--compile-flag "-Wno-error=unused-parameter " \
+	--compile-flag "-D_POSIX_C_SOURCE=1 "
 endif
 
 $(JERRY_SNAPSHOT_TOOL):

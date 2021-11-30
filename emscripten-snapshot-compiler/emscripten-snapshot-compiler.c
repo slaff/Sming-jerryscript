@@ -70,7 +70,7 @@ emscripten_snapshot_compiler_compile (const jerry_char_t *source_p, jerry_size_t
   // No errors, let's create the snapshot:
   uint32_t generate_snapshot_opts = 0;
   (void)is_for_global;
-  jerry_value_t generate_result = jerry_generate_snapshot (source_p, source_size, NULL, generate_snapshot_opts,
+  jerry_value_t generate_result = jerry_generate_snapshot (rv, generate_snapshot_opts,
 		  	  	  	  	  	  	  	  	  	  	  	  	  buffer_p, buffer_size);
 
   size_t snapshot_size = (size_t) jerry_get_number_value (generate_result);

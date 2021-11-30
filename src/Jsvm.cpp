@@ -38,7 +38,7 @@ bool Jsvm::eval(const String& jsCode)
 
 bool Jsvm::load(const uint32_t* snapshot, size_t size)
 {
-	jerry_value_t ret_code = jerry_exec_snapshot(snapshot, size, 0, JERRY_SNAPSHOT_EXEC_COPY_DATA);
+	jerry_value_t ret_code = jerry_exec_snapshot(snapshot, size, 0, JERRY_SNAPSHOT_EXEC_COPY_DATA, NULL);
 	bool is_error = jerry_value_is_error(ret_code);
 	jerry_release_value(ret_code);
 

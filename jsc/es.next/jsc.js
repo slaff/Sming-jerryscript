@@ -1206,10 +1206,10 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
- 53736: function() {
+ 58568: function() {
   throw new Error("Input must be valid UTF-8");
  },
- 53787: function($0) {
+ 58619: function($0) {
   throw new Error(UTF8ToString($0));
  }
 };
@@ -1515,11 +1515,11 @@ var asmLibraryArg = {
  "invoke_iii": invoke_iii,
  "invoke_iiii": invoke_iiii,
  "invoke_iiiii": invoke_iiiii,
+ "invoke_iiiiii": invoke_iiiiii,
  "invoke_vi": invoke_vi,
  "invoke_vii": invoke_vii,
  "invoke_viii": invoke_viii,
  "invoke_viiii": invoke_viiii,
- "invoke_viiiii": invoke_viiiii,
  "proc_exit": _proc_exit,
  "segfault": segfault,
  "setTempRet0": _setTempRet0
@@ -1595,17 +1595,6 @@ var _emscripten_get_sbrk_ptr = Module["_emscripten_get_sbrk_ptr"] = function() {
  return (_emscripten_get_sbrk_ptr = Module["_emscripten_get_sbrk_ptr"] = Module["asm"]["emscripten_get_sbrk_ptr"]).apply(null, arguments);
 };
 
-function invoke_vi(index, a1) {
- var sp = stackSave();
- try {
-  getWasmTableEntry(index)(a1);
- } catch (e) {
-  stackRestore(sp);
-  if (e !== e + 0 && e !== "longjmp") throw e;
-  _setThrew(1, 0);
- }
-}
-
 function invoke_ii(index, a1) {
  var sp = stackSave();
  try {
@@ -1617,10 +1606,21 @@ function invoke_ii(index, a1) {
  }
 }
 
-function invoke_iii(index, a1, a2) {
+function invoke_iiiiii(index, a1, a2, a3, a4, a5) {
  var sp = stackSave();
  try {
-  return getWasmTableEntry(index)(a1, a2);
+  return getWasmTableEntry(index)(a1, a2, a3, a4, a5);
+ } catch (e) {
+  stackRestore(sp);
+  if (e !== e + 0 && e !== "longjmp") throw e;
+  _setThrew(1, 0);
+ }
+}
+
+function invoke_vi(index, a1) {
+ var sp = stackSave();
+ try {
+  getWasmTableEntry(index)(a1);
  } catch (e) {
   stackRestore(sp);
   if (e !== e + 0 && e !== "longjmp") throw e;
@@ -1639,10 +1639,10 @@ function invoke_viii(index, a1, a2, a3) {
  }
 }
 
-function invoke_viiiii(index, a1, a2, a3, a4, a5) {
+function invoke_iii(index, a1, a2) {
  var sp = stackSave();
  try {
-  getWasmTableEntry(index)(a1, a2, a3, a4, a5);
+  return getWasmTableEntry(index)(a1, a2);
  } catch (e) {
   stackRestore(sp);
   if (e !== e + 0 && e !== "longjmp") throw e;

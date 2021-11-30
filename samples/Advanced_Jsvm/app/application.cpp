@@ -3,7 +3,6 @@
 #include <HttpMultipartResource.h>
 #include <Data/Stream/FileStream.h>
 #include <JsvmTask.h>
-#include <vm_functions.h>
 
 #ifndef WIFI_SSID
 #define WIFI_SSID "PleaseEnterSSID"
@@ -17,14 +16,10 @@ JsvmTask jsTask(jsVm);
 
 HttpServer webServer;
 
-Timer tempTimer;
-
 constexpr char MAIN_JS_FILE[]{"main.js.snap"};
 
 void startJsvm()
 {
-	jsVm.registerFunction("addEventListener", addEventListener);
-
 	// Load the snapshot file
 	if(!jsVm.loadFromFile(MAIN_JS_FILE)) {
 		debug_e("Failed executing the following script: %s", MAIN_JS_FILE);
@@ -58,11 +53,9 @@ void onTask(HttpRequest& request, HttpResponse& response)
 	if(runTask == "0") {
 		body = F("{\"status\": \"stopped\"}");
 		jsTask.suspend();
-		tempTimer.stop();
 	} else {
 		body = F("{\"status\": \"running\"}");
 		jsTask.resume();
-		tempTimer.start();
 	}
 
 	response.headers[HTTP_HEADER_CONTENT_TYPE] = toString(MIME_JSON);
@@ -98,7 +91,6 @@ int onUpload(HttpServerConnection& connection, HttpRequest& request, HttpRespons
 	if(response.isSuccess()) {
 		body = F("{\"status\": \"ok\"}");
 		jsTask.suspend();
-		tempTimer.stop();
 	}
 	response.headers[HTTP_HEADER_CONTENT_TYPE] = toString(MIME_JSON);
 	response.sendString(body);
@@ -122,12 +114,6 @@ void startWebServer()
 	webServer.paths.setDefault(onFile);
 
 	startJsvm();
-
-	tempTimer.initializeMs(2000, TimerDelegate([](){
-		JsEventData params;
-		params["temp"]="20";
-		triggerEvent("EVENT_TEMP", params);
-	})).startOnce();
 }
 
 } // namespace

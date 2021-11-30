@@ -5,9 +5,8 @@
 
 namespace
 {
-
-using EventList=Vector<jerry_value_t>;
-using Events=HashMap<String,EventList>;
+using EventList = Vector<jerry_value_t>;
+using Events = HashMap<String, EventList>;
 
 Events events;
 
@@ -39,7 +38,6 @@ jerry_value_t addEventListener(const jerry_value_t function_obj, const jerry_val
 		return jerry_create_boolean(false);
 	}
 
-	debug_d("Registering callback for event: %s", reinterpret_cast<char*>(eventName));
 	events[reinterpret_cast<char*>(eventName)].addElement(jerry_value_to_object(jsFunction));
 
 	return jerry_create_boolean(true);
@@ -57,6 +55,7 @@ void triggerEvent(const String& name, const JsEventData& data)
 	 * 		params: {
 	 * 			"property1": "value1",
 	 * 			"property2": "value2"
+	 * 			...
 	 * 		}
 	 * }
 	 */

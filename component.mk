@@ -12,7 +12,7 @@ COMPONENT_INCDIRS := \
 	$(JERRYSCRIPT_ROOT)/jerry-core \
 	$(COMPONENT_SRCDIRS)
 
-COMPONENT_DOCFILES := jerryscript/docs/img/engines_high_level_design.png
+COMPONENT_DOCFILES := jerryscript/docs/img/engines_high_level_design.png JerryScriptUpdate.rst
 
 # The size of the JerryScript engine heap. The size in kilobytes is allocated once and defined at compile time.
 COMPONENT_VARS := JERRY_GLOBAL_HEAP_SIZE

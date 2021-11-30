@@ -1,8 +1,5 @@
 COMPONENT_DEPENDS := MultipartParser jerryscript
 
-COMPONENT_SRCDIRS += src/
-COMPONENT_INCDIRS += $(COMPONENT_SRCDIRS)/include
-
 HWCONFIG := spiffs
 DEV_FILES := files/web
 SPIFF_FILES := out/web

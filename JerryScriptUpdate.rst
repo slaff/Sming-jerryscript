@@ -1,7 +1,7 @@
 Updating JerryScript
 ====================
 
-highlight:: bash
+.. highlight:: bash
 
 Currently we use Jerryscript version v2.4 from `JerryScript <https://github.com/jerryscript-project/jerryscript>`__,
 imported as a submodule.

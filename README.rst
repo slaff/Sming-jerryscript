@@ -22,14 +22,6 @@ To save space and be able to run JerryScript on an embedded device Sming compile
 This means that the JavaScript files have to be compiled before landing on the device.
 See the samples below to learn more.
 
-Samples
--------
-
-- :sample:`Basic_Sample` - demonstrates how to use JerryScript and run compiled JavaScript code on a micro-controller.
-- :sample:`Advanced_Sample` - demonstrates how to modify and compile JavaScript code on the fly using only your browser and run that code on a micro-controller.
-- :sample:`Event_Sample` - demonstrates how to write JavaScript applications using event-driven architecture.  
-
-
 Version
 -------
 
@@ -68,3 +60,4 @@ Credits
 -------
 
 The initial work on the JerryScript library for Sming was done as part of the `U:Kit project <https://github.com/attachix/ukit>`_. 
+

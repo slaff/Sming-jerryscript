@@ -11,18 +11,13 @@
 
 #pragma once
 
-#include <jerry-core/include/jerryscript.h>
+#include <jerryscript.h>
 #include <WHashMap.h>
 #include <WString.h>
-
-#ifdef __cplusplus
 
 using JsEventData = HashMap<String, String>;
 
 void triggerEvent(const String& name, const JsEventData& data);
-
-extern "C" {
-#endif
 
 /**
  * External functions that are available to JerryScript
@@ -48,7 +43,3 @@ extern "C" {
  */
 jerry_value_t addEventListener(const jerry_value_t function_obj, const jerry_value_t this_val,
 							   const jerry_value_t args_p[], const jerry_length_t args_cnt);
-
-#ifdef __cplusplus
-}
-#endif

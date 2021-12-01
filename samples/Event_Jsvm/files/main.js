@@ -28,3 +28,4 @@ function init() {
 	// an anonymous function.
 	addEventListener("EVENT_TEMP", thirdListener);
 }
+

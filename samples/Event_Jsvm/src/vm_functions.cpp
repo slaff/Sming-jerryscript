@@ -18,6 +18,10 @@ jerry_value_t addEventListener(const jerry_value_t function_obj, const jerry_val
 	(void)function_obj; /* unused */
 	(void)this_val;		/* unused */
 
+	if(args_cnt != 2) {
+		return jerry_create_boolean(false);
+	}
+
 	// First Parameter - Event Name
 	jerry_value_t value = jerry_value_to_string(args_p[0]);
 
@@ -105,6 +109,4 @@ void triggerEvent(const String& name, const JsEventData& data)
 	jerry_release_value(paramsProperty);
 
 	jerry_release_value(eventObject);
-
-	//	bool is_error = jerry_value_is_error(res);
 }

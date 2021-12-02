@@ -1,7 +1,7 @@
 Basic_Jsvm
 ==========
 
-.. highligh:: javascript
+.. highlight:: javascript
 
 This sample demonstrates running JavaScript applications in a sandbox inside a microcontroller.
 The sample uses the :component:`jerryscript` library for Sming.

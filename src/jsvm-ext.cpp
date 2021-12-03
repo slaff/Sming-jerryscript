@@ -15,8 +15,8 @@
 
 #define jerryx_port_handler_print_char(A) m_putc(A)
 
-jerry_value_t alertFunction(const jerry_value_t function_obj, const jerry_value_t this_val,
-							const jerry_value_t args_p[], const jerry_length_t args_cnt)
+jerry_value_t alertFunction(const jerry_call_info_t *call_info_p,
+							const jerry_value_t args_p[], const jerry_length_t args_count)
 {
 	jerry_value_t str_val = jerry_value_to_string(args_p[0]);
 
@@ -32,18 +32,15 @@ jerry_value_t alertFunction(const jerry_value_t function_obj, const jerry_value_
 	return jerry_create_boolean(true);
 }
 
-jerry_value_t printFunction(const jerry_value_t function_obj, const jerry_value_t this_val,
-							const jerry_value_t args_p[], const jerry_length_t args_cnt)
+jerry_value_t printFunction(const jerry_call_info_t *call_info_p,
+							const jerry_value_t args_p[], const jerry_length_t args_count)
 {
-	(void)function_obj; /* unused */
-	(void)this_val;		/* unused */
-
 	static const char* null_str = "\\u0000";
 	jerry_length_t arg_index = 0;
 
 	jerry_value_t ret_val = jerry_create_undefined();
 
-	for(arg_index = 0; jerry_value_is_undefined(ret_val) && arg_index < args_cnt; arg_index++) {
+	for(arg_index = 0; jerry_value_is_undefined(ret_val) && arg_index < args_count; arg_index++) {
 		jerry_value_t str_val = jerry_value_to_string(args_p[arg_index]);
 
 		if(!jerry_value_is_error(str_val)) {

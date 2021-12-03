@@ -1,0 +1,67 @@
+diff --git a/jerry-core/parser/js/js-parser.c b/jerry-core/parser/js/js-parser.c
+index b55baed5..bd6b41da 100644
+--- a/jerry-core/parser/js/js-parser.c
++++ b/jerry-core/parser/js/js-parser.c
+@@ -3356,12 +3356,9 @@ parser_parse_script (void *source_p, /**< source code */
+ 
+   return bytecode_p;
+ #else /* !JERRY_PARSER */
+-  JERRY_UNUSED (arg_list_p);
+-  JERRY_UNUSED (arg_list_size);
+   JERRY_UNUSED (source_p);
+-  JERRY_UNUSED (source_size);
+   JERRY_UNUSED (parse_opts);
+-  JERRY_UNUSED (resource_name);
++  JERRY_UNUSED (options_p);
+ 
+   ecma_raise_syntax_error (ECMA_ERR_PARSER_NOT_SUPPORTED);
+   return NULL;
+diff --git a/jerry-core/ecma/operations/ecma-eval.c b/jerry-core/ecma/operations/ecma-eval.c
+index e4a2d734..cd544844 100644
+--- a/jerry-core/ecma/operations/ecma-eval.c
++++ b/jerry-core/ecma/operations/ecma-eval.c
+@@ -94,8 +94,7 @@ ecma_op_eval_chars_buffer (void *source_p, /**< source code */
+ 
+   return vm_run_eval (bytecode_p, parse_opts);
+ #else /* !JERRY_PARSER */
+-  JERRY_UNUSED (code_p);
+-  JERRY_UNUSED (code_buffer_size);
++  JERRY_UNUSED (source_p);
+   JERRY_UNUSED (parse_opts);
+ 
+   return ecma_raise_syntax_error (ECMA_ERR_PARSER_NOT_SUPPORTED);
+diff --git a/jerry-core/ecma/base/ecma-helpers.c b/jerry-core/ecma/base/ecma-helpers.c
+index bd25d9d3..cce169bb 100644
+--- a/jerry-core/ecma/base/ecma-helpers.c
++++ b/jerry-core/ecma/base/ecma-helpers.c
+@@ -1626,11 +1626,13 @@ ecma_script_get_from_value (ecma_value_t value) /**< compiled code */
+       {
+         ecma_extended_object_t *ext_object_p = (ecma_extended_object_t *) object_p;
+ 
++#if JERRY_PARSER
+         if (ext_object_p->u.cls.type == ECMA_OBJECT_CLASS_SCRIPT)
+         {
+           bytecode_p = ECMA_GET_INTERNAL_VALUE_POINTER (ecma_compiled_code_t, ext_object_p->u.cls.u3.value);
+           break;
+         }
++#endif
+ 
+ #if JERRY_MODULE_SYSTEM
+         if (ext_object_p->u.cls.type == ECMA_OBJECT_CLASS_MODULE)
+diff --git a/jerry-core/api/jerryscript.c b/jerry-core/api/jerryscript.c
+index 13e3fd65..32444cd6 100644
+--- a/jerry-core/api/jerryscript.c
++++ b/jerry-core/api/jerryscript.c
+@@ -564,10 +564,12 @@ jerry_run (const jerry_value_t func_val) /**< function to run */
+ 
+   ecma_object_t *object_p = ecma_get_object_from_value (func_val);
+ 
++#if JERRY_PARSER
+   if (!ecma_object_class_is (object_p, ECMA_OBJECT_CLASS_SCRIPT))
+   {
+     return jerry_throw (ecma_raise_type_error (ECMA_ERR_WRONG_ARGS_MSG));
+   }
++#endif
+ 
+   ecma_extended_object_t *ext_object_p = (ecma_extended_object_t *) object_p;
+ 

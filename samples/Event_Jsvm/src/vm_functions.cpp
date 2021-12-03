@@ -12,13 +12,12 @@ Events events;
 
 } // namespace
 
-jerry_value_t addEventListener(const jerry_value_t function_obj, const jerry_value_t this_val,
-							   const jerry_value_t args_p[], const jerry_length_t args_cnt)
+jerry_value_t addEventListener(const jerry_call_info_t* call_info_p, const jerry_value_t args_p[],
+							   const jerry_length_t args_count)
 {
-	(void)function_obj; /* unused */
-	(void)this_val;		/* unused */
+	(void)call_info_p;
 
-	if(args_cnt != 2) {
+	if(args_count != 2) {
 		return jerry_create_boolean(false);
 	}
 

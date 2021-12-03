@@ -43,7 +43,10 @@ emscripten_snapshot_compiler_compile (const jerry_char_t *source_p, jerry_size_t
   // Call jerry_parse () first, because this return errors if there are any,
   // while jerry_parse_and_save_snapshot () does not return errors...
   jerry_init (JERRY_INIT_EMPTY);
-  jerry_value_t rv = jerry_parse (NULL, 0, source_p, source_size, is_strict ? JERRY_PARSE_STRICT_MODE: JERRY_PARSE_NO_OPTS);
+  jerry_parse_options_t parse_options = {
+    .options = is_strict ? JERRY_PARSE_STRICT_MODE: JERRY_PARSE_NO_OPTS,
+  };
+  jerry_value_t rv = jerry_parse (source_p, source_size, &parse_options);
   if (jerry_value_is_error (rv))
   {
     jerry_get_value_from_error (rv, false);
@@ -67,7 +70,7 @@ emscripten_snapshot_compiler_compile (const jerry_char_t *source_p, jerry_size_t
   // No errors, let's create the snapshot:
   uint32_t generate_snapshot_opts = 0;
   (void)is_for_global;
-  jerry_value_t generate_result = jerry_generate_snapshot (NULL, 0, source_p, source_size, generate_snapshot_opts,
+  jerry_value_t generate_result = jerry_generate_snapshot (rv, generate_snapshot_opts,
 		  	  	  	  	  	  	  	  	  	  	  	  	  buffer_p, buffer_size);
 
   size_t snapshot_size = (size_t) jerry_get_number_value (generate_result);

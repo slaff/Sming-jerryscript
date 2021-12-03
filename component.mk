@@ -39,6 +39,7 @@ endif
 JERRY_WEB_COMPILER := $(COMPONENT_PATH)/jsc/$(JERRY_PROFILE)
 
 COMPONENT_CFLAGS += \
+	-Wno-error=unused-function \
 	-DJERRY_GLOBAL_HEAP_SIZE=$(JERRY_GLOBAL_HEAP_SIZE) \
 	-DJERRY_LCACHE=0  \
 	-DJERRY_PARSER=0 \
@@ -49,10 +50,15 @@ COMPONENT_CFLAGS += \
 # Build version of tool compatible with library
 DEBUG_VARS += JERRY_SNAPSHOT_TOOL
 JERRY_BUILD_DIR := $(COMPONENT_PATH)/jerryscript/out/$(call CalculateVariantHash,JERRY_COMPILER_FLAGS)
+JERRY_SNAPSHOT_TOOL := $(JERRY_BUILD_DIR)/bin/jerry-snapshot$(TOOL_EXT)
+
 ifeq ($(UNAME),Windows)
-JERRY_SNAPSHOT_TOOL := $(JERRY_BUILD_DIR)/bin/MinSizeRel/jerry-snapshot.exe
-else
-JERRY_SNAPSHOT_TOOL := $(JERRY_BUILD_DIR)/bin/jerry-snapshot
+JERRY_CMAKE_PARAMS := \
+	--cmake-param "-GMSYS Makefiles" \
+	--compile-flag "-I $(JERRYSCRIPT_ROOT)/../src/include" \
+	--compile-flag "-std=gnu11 " \
+	--compile-flag "-Wno-error=unused-parameter " \
+	--compile-flag "-D_POSIX_C_SOURCE=1 "
 endif
 
 $(JERRY_SNAPSHOT_TOOL):
@@ -60,6 +66,7 @@ $(JERRY_SNAPSHOT_TOOL):
 		--lto OFF \
 		--jerry-cmdline-snapshot ON \
 		--builddir "$(JERRY_BUILD_DIR)" \
+		$(JERRY_CMAKE_PARAMS) \
 		$(patsubst %,--compile-flag "-D %",$(JERRY_COMPILER_FLAGS))
 
 jerryscript-clean: jerry-tools-clean

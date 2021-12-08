@@ -26,7 +26,7 @@ void startJsvm()
 		return;
 	}
 
-	// Now you can initilize your script by calling a setup() JavaScript function
+	// Now you can initialize your script by calling a setup() JavaScript function
 	if(!jsVm.runFunction("setup")) {
 		debug_e("Failed executing the setup function.");
 	}

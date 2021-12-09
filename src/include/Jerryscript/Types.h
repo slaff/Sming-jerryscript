@@ -1,0 +1,920 @@
+/****
+ * Sming Framework Project - Open Source framework for high efficiency native ESP8266 development.
+ * Created 2015 by Skurydin Alexey
+ * http://github.com/SmingHub/Sming
+ * All files of the Sming Core are provided under the LGPL v3 license.
+ *
+ * Types.h
+ *
+ * @author: Dec 2021 - Mikee47 <mike@sillyhouse.net>
+ *
+ */
+
+#pragma once
+
+#include <jerryscript.h>
+#include <WString.h>
+#include <WVector.h>
+
+extern "C" {
+#include <ecma/base/ecma-helpers.h>
+}
+
+namespace Jerryscript
+{
+#define JERRY_VALUE_TYPE_MAP(XX)                                                                                       \
+	XX(JERRY_TYPE_NONE, None)                                                                                          \
+	XX(JERRY_TYPE_UNDEFINED, Undefined)                                                                                \
+	XX(JERRY_TYPE_NULL, Null)                                                                                          \
+	XX(JERRY_TYPE_BOOLEAN, Boolean)                                                                                    \
+	XX(JERRY_TYPE_NUMBER, Number)                                                                                      \
+	XX(JERRY_TYPE_STRING, String)                                                                                      \
+	XX(JERRY_TYPE_OBJECT, Object)                                                                                      \
+	XX(JERRY_TYPE_FUNCTION, Function)                                                                                  \
+	XX(JERRY_TYPE_ERROR, Error)                                                                                        \
+	XX(JERRY_TYPE_SYMBOL, Symbol)                                                                                      \
+	XX(JERRY_TYPE_BIGINT, BigInt)
+
+enum class Type {
+#define XX(jt, t) t = jt,
+	JERRY_VALUE_TYPE_MAP(XX)
+#undef XX
+};
+
+#define JERRY_ERROR_TYPE_MAP(XX)                                                                                       \
+	XX(JERRY_ERROR_NONE, None)                                                                                         \
+	XX(JERRY_ERROR_COMMON, Common)                                                                                     \
+	XX(JERRY_ERROR_EVAL, Eval)                                                                                         \
+	XX(JERRY_ERROR_RANGE, Range)                                                                                       \
+	XX(JERRY_ERROR_REFERENCE, Reference)                                                                               \
+	XX(JERRY_ERROR_SYNTAX, Syntax)                                                                                     \
+	XX(JERRY_ERROR_TYPE, Type)                                                                                         \
+	XX(JERRY_ERROR_URI, URI)                                                                                           \
+	XX(JERRY_ERROR_AGGREGATE, Aggregate)
+
+enum class ErrorType {
+#define XX(je, e) e = je,
+	JERRY_ERROR_TYPE_MAP(XX)
+#undef XX
+};
+
+#define JERRY_OBJECT_TYPE_MAP(XX)                                                                                      \
+	XX(JERRY_OBJECT_TYPE_NONE, None)                                                                                   \
+	XX(JERRY_OBJECT_TYPE_GENERIC, Generic)                                                                             \
+	XX(JERRY_OBJECT_TYPE_MODULE_NAMESPACE, ModuleNamespace)                                                            \
+	XX(JERRY_OBJECT_TYPE_ARRAY, Array)                                                                                 \
+	XX(JERRY_OBJECT_TYPE_PROXY, Proxy)                                                                                 \
+	XX(JERRY_OBJECT_TYPE_SCRIPT, Script)                                                                               \
+	XX(JERRY_OBJECT_TYPE_MODULE, Module)                                                                               \
+	XX(JERRY_OBJECT_TYPE_PROMISE, Promise)                                                                             \
+	XX(JERRY_OBJECT_TYPE_DATAVIEW, Dataview)                                                                           \
+	XX(JERRY_OBJECT_TYPE_FUNCTION, Function)                                                                           \
+	XX(JERRY_OBJECT_TYPE_TYPEDARRAY, TypedArray)                                                                       \
+	XX(JERRY_OBJECT_TYPE_ITERATOR, Iterator)                                                                           \
+	XX(JERRY_OBJECT_TYPE_CONTAINER, Container)                                                                         \
+	XX(JERRY_OBJECT_TYPE_ERROR, Error)                                                                                 \
+	XX(JERRY_OBJECT_TYPE_ARRAYBUFFER, ArrayBuffer)                                                                     \
+	XX(JERRY_OBJECT_TYPE_SHARED_ARRAY_BUFFER, SharedArrayBuffer)                                                       \
+	XX(JERRY_OBJECT_TYPE_ARGUMENTS, Arguments)                                                                         \
+	XX(JERRY_OBJECT_TYPE_BOOLEAN, Boolean)                                                                             \
+	XX(JERRY_OBJECT_TYPE_DATE, Date)                                                                                   \
+	XX(JERRY_OBJECT_TYPE_NUMBER, Number)                                                                               \
+	XX(JERRY_OBJECT_TYPE_REGEXP, Regexp)                                                                               \
+	XX(JERRY_OBJECT_TYPE_STRING, String)                                                                               \
+	XX(JERRY_OBJECT_TYPE_SYMBOL, Symbol)                                                                               \
+	XX(JERRY_OBJECT_TYPE_GENERATOR, Generator)                                                                         \
+	XX(JERRY_OBJECT_TYPE_BIGINT, BigInt)                                                                               \
+	XX(JERRY_OBJECT_TYPE_WEAKREF, WeakRef)
+
+enum class ObjectType {
+#define XX(jot, ot) ot = jot,
+	JERRY_OBJECT_TYPE_MAP(XX)
+#undef XX
+};
+
+#define JERRY_FUNCTION_TYPE_MAP(XX)                                                                                    \
+	XX(JERRY_FUNCTION_TYPE_NONE, None)                                                                                 \
+	XX(JERRY_FUNCTION_TYPE_GENERIC, Generic)                                                                           \
+	XX(JERRY_FUNCTION_TYPE_ACCESSOR, Accessor)                                                                         \
+	XX(JERRY_FUNCTION_TYPE_BOUND, Bound)                                                                               \
+	XX(JERRY_FUNCTION_TYPE_ARROW, Arrow)                                                                               \
+	XX(JERRY_FUNCTION_TYPE_GENERATOR, Generator)
+
+enum class FunctionType {
+#define XX(jft, ft) ft = jft,
+	JERRY_FUNCTION_TYPE_MAP(XX)
+#undef XX
+};
+
+/**
+ * @brief Use to initialise Value object by taking ownership of native/raw jerryscript value
+ *
+ * e.g. `Value myValue = OwnedValue{raw_value};`
+ * 
+ * This typecast is necessary because `jerry_value_t` is weakly typed (as uint32_t).
+ */
+struct OwnedValue {
+	jerry_value_t value;
+};
+
+/**
+ * @brief Use to initialise Value object by copying native/raw jerryscript value
+ *
+ * e.g. `Value myValue = CopyValue{raw_value};`
+ */
+struct CopyValue {
+	jerry_value_t value;
+};
+
+/**
+ * @brief Use to initialise Value object to a string given a native/raw jerryscript value
+ *
+ * e.g. `Value myValue = StringValue{raw_value};`
+ */
+struct StringValue {
+	jerry_value_t value;
+};
+
+/**
+ * @brief Use to create Value containing javascript 'undefined'
+ *
+ * e.g. `Value myValue = Undefined{};`
+ */
+struct Undefined {
+	jerry_value_t value = ECMA_VALUE_UNDEFINED;
+};
+
+/**
+ * @brief Use to create Value containing javascript 'null'
+ *
+ * e.g. `Value myValue = Null{};`
+ */
+struct Null {
+	jerry_value_t value = ECMA_VALUE_NULL;
+};
+
+class Object;
+class Array;
+
+/**
+ * @brief Represents a Jerryscript value
+ *
+ * This class resembles `std::unique_ptr` to manage a raw/native `jerry_value_t` value.
+ * The `get()`, `reset()` and `release()` methods all behave in the same manner.
+ *
+ * In addition, it provides intrinsic casts from numeric/boolean C++ types plus `String`.
+ *
+ * You can therefore create a value like this::
+ *
+ * ```
+ * Value value = 12;
+ * Value str = "My String";
+ * Value str2 = F("My other String");
+ * ```
+ *
+ * If you need to working with floating point values be sure to compile with `JERRY_COMPACT_PROFILE=0`.
+ *
+ * IMPORTANT: When dealing with raw/native values, **ALWAYS** use either `OwnedValue` or `CopyValue` casts.
+ * 
+ *   - This is correct:  Value value = OwnedValue{jerry_create_object()};
+ *   - This is wrong:    Value value = jerry_create_object(); // Ends up with memory leak plus garbage
+ *
+ * @endrst
+ */
+class Value
+{
+public:
+	using List = Vector<Value>;
+
+	/**
+	 * @brief Construct An empty (unused) value
+	 */
+	Value()
+	{
+	}
+
+	/**
+	 * @brief Construct a Value and take ownership of the given native value
+	 */
+	Value(const OwnedValue& value) : value(value.value)
+	{
+	}
+
+	/**
+	 * @brief Construct a Value using a copy (or reference to) the given native value
+	 */
+	Value(const CopyValue& value) : value(jerry_acquire_value(value.value))
+	{
+	}
+
+	/**
+	 * @brief Construct a string Value from the given native value
+	 */
+	Value(const StringValue& value) : value(jerry_value_to_string(value.value))
+	{
+	}
+
+	Value(const Undefined&) : value(ECMA_VALUE_UNDEFINED)
+	{
+	}
+
+	Value(const Null&) : value(ECMA_VALUE_NULL)
+	{
+	}
+
+	/**
+	 * @brief Copy constructor
+	 */
+	Value(const Value& value) : Value(CopyValue{value.value})
+	{
+	}
+
+	/**
+	 * @brief Move constructor
+	 */
+	Value(Value&& value)
+	{
+		std::swap(this->value, value.value);
+	}
+
+	/**
+	 * @name Construct a value from a simple type
+	 * @{
+	 */
+	Value(int value) : Value(OwnedValue{ecma_make_int32_value(value)})
+	{
+	}
+
+	Value(unsigned value) : Value(OwnedValue{ecma_make_uint32_value(value)})
+	{
+	}
+
+	Value(double value) : Value(OwnedValue{jerry_create_number(value)})
+	{
+	}
+
+	Value(bool value) : Value(OwnedValue{jerry_create_boolean(value)})
+	{
+	}
+
+	Value(const String& s)
+		: Value(OwnedValue{jerry_create_string_sz(reinterpret_cast<const jerry_char_t*>(s.c_str()), s.length())})
+	{
+	}
+
+	Value(const char* s) : Value(OwnedValue{jerry_create_string(reinterpret_cast<const jerry_char_t*>(s))})
+	{
+	}
+
+	Value(const FSTR::String& s) : Value(String(s))
+	{
+	}
+	/** @} */
+
+	~Value()
+	{
+		reset();
+	}
+
+	/**
+	 * @brief Assignment copy operator
+	 */
+	Value& operator=(const Value& value)
+	{
+		*this = CopyValue{value.value};
+		return *this;
+	}
+
+	/**
+	 * @brief Assignment move operator
+	 */
+	Value& operator=(Value&& value)
+	{
+		reset();
+		std::swap(this->value, value.value);
+		return *this;
+	}
+
+	/**
+	 * @brief Reset contents of object to new value (default is unassigned)
+	 */
+	Value& reset(jerry_value_t value = ECMA_VALUE_EMPTY)
+	{
+		if(value != this->value) {
+			jerry_release_value(this->value);
+			this->value = value;
+		}
+		return *this;
+	}
+
+	/**
+	 * @name Get raw/native value for use with jerryscript C API
+	 * @{
+	 */
+	const jerry_value_t& get() const
+	{
+		return value;
+	}
+
+	jerry_value_t& get()
+	{
+		return value;
+	}
+	/** @} */
+
+	/**
+	 * @brief Get raw/native value and release ownership.
+	 */
+	jerry_value_t release()
+	{
+		auto res = value;
+		value = ECMA_VALUE_EMPTY;
+		return res;
+	}
+
+	/**
+	 * @name Checks on value type
+	 * @{
+	 */
+
+	/**
+	 * @brief Is this object a function? If so, can cast to `Callable` type.
+	 */
+	bool isCallable() const
+	{
+		return jerry_value_is_function(value);
+	}
+
+	/**
+	 * @brief Can this object be accessed as an array? If so, can cast to `Array` type.
+	 */
+	bool isArray() const
+	{
+		return jerry_value_is_array(value);
+	}
+
+	/**
+	 *
+	 * @brief Determine if value represents an error. If so, can cast to `Error` type.
+	 */
+	bool isError() const
+	{
+		return jerry_value_is_error(value);
+	}
+
+	/**
+	 * @brief An empty Value contains nothing, i.e. no javascript type has been assigned.
+	 * This gets interpreted as 'undefined' if any attempt is made to use it in javascript.
+	 */
+	bool isEmpty() const
+	{
+		return value != ECMA_VALUE_EMPTY;
+	}
+
+	/**
+	 * @brief Contains a javascript value, but contents undefined
+	 */
+	bool isDefined() const
+	{
+		return value != ECMA_VALUE_UNDEFINED;
+	}
+
+	/**
+	 * @brief A true/false value type
+	 */
+	bool isBoolean() const
+	{
+		return jerry_value_is_boolean(value);
+	}
+
+	/**
+	 * @brief Is this a Boolean type set to False?
+	 */
+	bool isFalse() const
+	{
+		return value == ECMA_VALUE_FALSE;
+	}
+
+	/**
+	 * @brief Is this a Boolean type set to True?
+	 */
+	bool isTrue() const
+	{
+		return value == ECMA_VALUE_TRUE;
+	}
+
+	/**
+	 * @brief Is this a NULL value?
+	 */
+	bool isNull() const
+	{
+		return value == ECMA_VALUE_NULL;
+	}
+
+	/**
+	 * @brief Is this a String?
+	 */
+	bool isString() const
+	{
+		return jerry_value_is_string(value);
+	}
+
+	/**
+	 * @brief Is this an Object type? If so, can cast to `Object` class.
+	 */
+	bool isObject() const
+	{
+		return jerry_value_is_object(value);
+	}
+
+	/**
+	 * @brief Does this value contain a Number?
+	 */
+	bool isNumber() const
+	{
+		return jerry_value_is_number(value);
+	}
+	/** @} */
+
+	/**
+	 * @brief Get value type
+	 */
+	Type type() const
+	{
+		return Type(jerry_value_get_type(value));
+	}
+
+	/**
+	 * @brief Create a new object from this value
+	 */
+	Object toObject() const;
+
+	/**
+	 * @brief Create a new string value from this value
+	 */
+	Value toString() const
+	{
+		return StringValue{value};
+	}
+
+	/**
+	 * @brief Get content from within a string value
+	 * @param offset First character position to read, starting from 0
+	 * @param buffer Where to store character data
+	 * @param length Number of characters to read
+	 * @retval size_t Number of characters read
+	 */
+	size_t readString(unsigned offset, char* buffer, size_t length) const;
+
+	/**
+	 * @brief Get content from within a string value
+	 * @param offset First character position to read, starting from 0
+	 * @param length Number of characters to read
+	 * @retval String Requested range, or nullptr if value is not a string
+	 */
+	String subString(unsigned offset, size_t length) const;
+
+	/**
+	 * @brief Support intrinsic cast to Wiring String
+	 */
+	operator String() const;
+
+	/**
+	 * @brief Used by `as()` method
+	 */
+	struct As {
+		const Value& v;
+
+		operator bool() const
+		{
+			return v.isTrue();
+		}
+
+		operator int() const
+		{
+			return jerry_value_as_int32(v.get());
+		}
+
+		operator unsigned() const
+		{
+			return jerry_value_as_uint32(v.get());
+		}
+
+		operator float() const
+		{
+			return jerry_get_number_value(v.get());
+		}
+
+		operator double() const
+		{
+			return jerry_get_number_value(v.get());
+		}
+
+		operator String() const
+		{
+			return String(v);
+		}
+	};
+
+	/**
+	 * @brief Get value of object with specific type.
+	 * e.g. `value.as<int>()`.
+	 *
+	 * Return value will revert to sensible default if conversion cannot be completed.
+	 * If in doubt, check type first.
+	 */
+	template <typename T> T as() const
+	{
+		return T(As{*this});
+	}
+
+private:
+	jerry_value_t value{ECMA_VALUE_EMPTY};
+};
+
+/**
+ * @brief Objects support named properties
+ */
+class Object : public Value
+{
+public:
+	using List = Vector<Object>;
+
+	/**
+	 * @brief Iterator and operator[] access uses this wrapper class so items may be written or read
+	 */
+	struct NamedItem {
+	public:
+		const String& name() const
+		{
+			return mName;
+		}
+
+		operator Value() const
+		{
+			return mObject.getProperty(mName);
+		}
+
+		operator String() const
+		{
+			return operator Value();
+		}
+
+		NamedItem& operator=(const Value& value)
+		{
+			mObject.setProperty(mName, value);
+			return *this;
+		}
+
+	private:
+		friend class Object;
+
+		NamedItem(Object& object, const String& name) : mObject(object), mName(name)
+		{
+		}
+
+		Object& mObject;
+		String mName;
+	};
+
+	using Value::Value;
+
+	/**
+	 * @brief Default constructor creates a new, empty object
+	 */
+	Object() : Value(OwnedValue{jerry_create_object()})
+	{
+	}
+
+	Object(const Value& value) : Value(value)
+	{
+	}
+
+	Object(Value&& value) : Value(std::move(value))
+	{
+	}
+
+	/**
+	 * @name Access object properties by name
+	 * @{
+	 */
+	NamedItem operator[](const String& name)
+	{
+		return NamedItem(*this, name);
+	}
+
+	const Value operator[](const String& name) const
+	{
+		return getProperty(name);
+	}
+
+	Value setProperty(const Value& name, const Value& value)
+	{
+		return OwnedValue{jerry_set_property(get(), name.get(), value.get())};
+	}
+
+	Value getProperty(const Value& name) const
+	{
+		return OwnedValue{jerry_get_property(get(), name.get())};
+	}
+
+	bool hasProperty(const Value& name) const
+	{
+		return jerry_has_property(get(), name.get());
+	}
+
+	bool removeProperty(const Value& name)
+	{
+		return jerry_delete_property(get(), name.get());
+	}
+	/** @} */
+
+	/**
+	 * @brief Get list of property names
+	 */
+	Array keys() const;
+};
+
+/**
+ * @brief Error object class
+ */
+class Error : public Value
+{
+public:
+	using Value::Value;
+
+	/**
+	 * @name Create an error object
+	 * @{
+	 */
+	Error(ErrorType type) : Value(OwnedValue{jerry_create_error_sz(jerry_error_t(type), nullptr, 0)})
+	{
+	}
+
+	Error(ErrorType type, const String& message)
+		: Value(OwnedValue{jerry_create_error_sz(
+			  jerry_error_t(type), reinterpret_cast<const jerry_char_t*>(message.c_str()), message.length())})
+	{
+	}
+	/** @} */
+
+	Error(const Value& value) : Value(value)
+	{
+	}
+
+	Error(Value&& value) : Value(std::move(value))
+	{
+	}
+
+	/**
+	 * @brief Get type of error
+	 */
+	ErrorType errorType() const
+	{
+		return ErrorType(jerry_get_error_type(get()));
+	}
+
+	/**
+	 * @brief Get error message, if any
+	 */
+	Value message() const;
+
+	/**
+	 * @brief Formulate error message
+	 * Base operator in Value class returns empty value for errors.
+	 * To obtain error message, check for `isError()` then cast to Error():
+	 * 
+	 * ```
+	 * if (value.isError()) {
+	 *   Serial.println(JS::Error(value));
+	 * }
+	 * ```
+	 */
+	operator String() const;
+};
+
+class ArgumentError : public Error
+{
+public:
+	ArgumentError(const String& functionName) : Error(ErrorType::Type, functionName + F(": Invalid arguments"))
+	{
+	}
+};
+
+/**
+ * @brief Array objects have properties accessed by index
+ */
+class Array : public Object
+{
+public:
+	class Iterator;
+
+	/**
+	 * @brief Iterator and operator[] access uses this wrapper class so items may be written or read
+	 */
+	struct IndexedItem {
+	public:
+		unsigned index() const
+		{
+			return mIndex;
+		}
+
+		operator Value() const
+		{
+			return mArray.getProperty(mIndex);
+		}
+
+		operator String() const
+		{
+			return operator Value();
+		}
+
+		IndexedItem& operator=(const Value& value)
+		{
+			mArray.setProperty(mIndex, value);
+			return *this;
+		}
+
+		bool operator==(const IndexedItem& rhs) const
+		{
+			return &mArray == &rhs.mArray && mIndex == rhs.mIndex;
+		}
+
+	private:
+		friend class Array;
+		friend class Iterator;
+
+		IndexedItem(Array& array, unsigned index) : mArray(array), mIndex(index)
+		{
+		}
+
+		Array& mArray;
+		unsigned mIndex;
+	};
+
+	class Iterator : public std::iterator<std::random_access_iterator_tag, IndexedItem>
+	{
+	public:
+		Iterator(const Iterator&) = default;
+
+		Iterator(Array& array, unsigned index) : item(array, index)
+		{
+		}
+
+		Iterator& operator++()
+		{
+			++item.mIndex;
+			return *this;
+		}
+
+		Iterator operator++(int)
+		{
+			Iterator tmp(*this);
+			++item.mIndex;
+			return tmp;
+		}
+
+		Iterator operator+=(size_t distance)
+		{
+			Iterator tmp(*this);
+			item.mIndex += distance;
+			return tmp;
+		}
+
+		bool operator==(const Iterator& rhs) const
+		{
+			return item == rhs.item;
+		}
+
+		bool operator!=(const Iterator& rhs) const
+		{
+			return !operator==(rhs);
+		}
+
+		IndexedItem operator*()
+		{
+			return item;
+		}
+
+	private:
+		IndexedItem item;
+	};
+
+	using Object::Object;
+
+	/**
+	 * @brief Create a new, fixed-size array with the given number of elements
+	 */
+	Array(size_t size) : Object(OwnedValue{jerry_create_array(size)})
+	{
+	}
+
+	/**
+	 * @name Get number of elements in the array
+	 * @{
+	 */
+	size_t length() const
+	{
+		return jerry_get_array_length(get());
+	}
+
+	size_t count() const
+	{
+		return length();
+	}
+	/** @} */
+
+	/**
+	 * @name Iterator support
+	 * @{
+	 */
+	Iterator begin()
+	{
+		return Iterator(*this, 0);
+	}
+
+	Iterator end()
+	{
+		return Iterator(*this, count());
+	}
+	/** @} */
+
+	/**
+	 * @name Array element/property access by index
+	 * @{
+	 */
+	IndexedItem operator[](unsigned index)
+	{
+		return IndexedItem(*this, index);
+	}
+
+	const Value operator[](unsigned index) const
+	{
+		return getProperty(index);
+	}
+
+	Value getProperty(unsigned index) const
+	{
+		return OwnedValue{jerry_get_property_by_index(get(), index)};
+	}
+
+	Value setProperty(unsigned index, const Value& value)
+	{
+		return OwnedValue{jerry_set_property_by_index(get(), index, value.get())};
+	}
+	/** @} */
+};
+
+/**
+ * @brief Callable object represent functions
+ */
+class Callable : public Object
+{
+public:
+	using List = Vector<Callable>;
+
+	using Object::Object;
+
+	Value call(const Object& thisValue)
+	{
+		return OwnedValue{jerry_call_function(get(), thisValue.get(), nullptr, 0)};
+	}
+
+	Value call(const Object& thisValue, const Value& arg)
+	{
+		return OwnedValue{jerry_call_function(get(), thisValue.get(), &const_cast<Value&>(arg).get(), 1)};
+	}
+
+	Value call(const Object& thisValue, std::initializer_list<Value> args)
+	{
+		return OwnedValue{jerry_call_function(get(), thisValue.get(), &args.begin()->get(), args.size())};
+	}
+
+	FunctionType functionType() const
+	{
+		return FunctionType(jerry_function_get_type(get()));
+	}
+};
+
+class ExternalFunction : public Value
+{
+public:
+	ExternalFunction(jerry_external_handler_t handler) : Value(OwnedValue{jerry_create_external_function(handler)})
+	{
+	}
+};
+
+/**
+ * @brief Get global object
+ */
+inline Object global()
+{
+	return OwnedValue{jerry_get_global_object()};
+}
+
+} // namespace Jerryscript
+
+String toString(Jerryscript::Type type);
+String toString(Jerryscript::ErrorType errorType);
+String toString(Jerryscript::ObjectType objectType);
+String toString(Jerryscript::FunctionType functionType);

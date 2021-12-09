@@ -25,7 +25,7 @@ void triggerEvent(const String& name, const JsEventData& data);
 
 /**
  * @brief Function to register event listeners
- * @code {.javascipt}
+ * @code {.javascript}
  * 
  * event = {
  *    name => "TEMP_CHANGE",

@@ -39,8 +39,7 @@ void jerry_port_log(jerry_log_level_t level, /**< log level */
 
 	va_list args;
 	va_start(args, format);
-	/* TODO, uncomment when vprint link is ok */
-	/* vprintf (stderr, format, args); */
+	m_vprintf(format, args);
 	va_end(args);
 } /* jerry_port_log */
 
@@ -66,37 +65,10 @@ double jerry_port_get_local_time_zone_adjustment(double unix_ms, /**< ms since u
 	return 0.0;
 }
 
-static bool abort_on_fail = false;
-
-/**
- * Sets whether 'abort' should be called instead of 'exit' upon exiting with
- * non-zero exit code in the default implementation of jerry_port_fatal.
- */
-void jerry_port_default_set_abort_on_fail(bool flag) /**< new value of 'abort on fail' flag */
-{
-	abort_on_fail = flag;
-} /* jerry_port_default_set_abort_on_fail */
-
-/**
- * Check whether 'abort' should be called instead of 'exit' upon exiting with
- * non-zero exit code in the default implementation of jerry_port_fatal.
- *
- * @return true - if 'abort on fail' flag is set,
- *         false - otherwise.
- */
-bool jerry_port_default_is_abort_on_fail()
-{
-	return abort_on_fail;
-} /* jerry_port_default_is_abort_on_fail */
-
 /**
  * Default implementation of jerry_port_fatal.
  */
 void jerry_port_fatal(jerry_fatal_code_t code)
 {
-	if(code != 0 && code != ERR_OUT_OF_MEMORY && jerry_port_default_is_abort_on_fail()) {
-		abort();
-	} else {
-		exit(code);
-	}
+	abort();
 } /* jerry_port_fatal */

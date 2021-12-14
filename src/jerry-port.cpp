@@ -12,7 +12,8 @@
 #include <stdarg.h>
 #include <sys/time.h>
 
-#include <jerry-core/include/jerryscript-port.h>
+#include <include/jerryscript-port.h>
+#include <include/jerryscript-core.h>
 #include <debug_progmem.h>
 #include <Platform/RTC.h>
 
@@ -72,3 +73,19 @@ void jerry_port_fatal(jerry_fatal_code_t code)
 {
 	abort();
 } /* jerry_port_fatal */
+
+/**
+ * Default module resolver.
+ *
+ * @return a module object if resolving is successful, an error otherwise
+ */
+jerry_value_t jerry_port_module_resolve(const jerry_value_t specifier, /**< module specifier string */
+										const jerry_value_t referrer,  /**< parent module */
+										void* user_p)				   /**< user data */
+{
+	(void)specifier;
+	(void)referrer;
+	(void)user_p;
+
+	return jerry_create_error(JERRY_ERROR_REFERENCE, nullptr);
+}

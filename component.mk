@@ -8,7 +8,7 @@ COMPONENT_SRCDIRS := \
 	$(call ListAllSubDirs,$(JERRYSCRIPT_ROOT)/jerry-core)
 
 COMPONENT_INCDIRS := \
-	src/include jerryscript \
+	src/include \
 	$(JERRYSCRIPT_ROOT)/jerry-core \
 	$(COMPONENT_SRCDIRS)
 
@@ -60,9 +60,8 @@ ifeq ($(UNAME),Windows)
 JERRY_CMAKE_PARAMS := \
 	--cmake-param "-GMSYS Makefiles" \
 	--compile-flag "-I $(JERRYSCRIPT_ROOT)/../src/include" \
-	--compile-flag "-std=gnu11 " \
 	--compile-flag "-Wno-error=unused-parameter " \
-	--compile-flag "-D_POSIX_C_SOURCE=1 "
+	--compile-flag "-D_POSIX_C_SOURCE=1 -U__STRICT_ANSI__"
 endif
 
 $(JERRY_SNAPSHOT_TOOL):

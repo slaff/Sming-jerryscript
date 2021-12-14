@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <jerryscript.h>
+#include <include/jerryscript.h>
 #include <WString.h>
 #include <WVector.h>
 

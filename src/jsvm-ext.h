@@ -11,28 +11,18 @@
 
 #pragma once
 
-#include <jerry-core/include/jerryscript.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "include/Jerryscript/Function.h"
 
 /**
  * External functions that are available to JerryScript
  */
 
 /**
- * brief Function that prints data in the debug console
+ * @brief Function that prints data in the debug console
  */
-jerry_value_t alertFunction(const jerry_call_info_t *call_info_p,
-							const jerry_value_t args_p[], const jerry_length_t args_count);
+JS_DECLARE_FUNCTION(alertFunction)
 
 /**
- * brief Function that prints data in the standard console
+ * @brief Function that prints data in the standard console
  */
-jerry_value_t printFunction(const jerry_call_info_t *call_info_p,
-							const jerry_value_t args_p[], const jerry_length_t args_count);
-
-#ifdef __cplusplus
-}
-#endif
+JS_DECLARE_FUNCTION(printFunction)

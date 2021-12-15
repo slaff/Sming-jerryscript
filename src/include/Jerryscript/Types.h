@@ -939,18 +939,11 @@ public:
 
 	/**
 	 * @brief Get number of elements in the array
-	 * @{
 	 */
-	size_t length() const
+	size_t count() const
 	{
 		return jerry_get_array_length(get());
 	}
-
-	size_t count() const
-	{
-		return length();
-	}
-	/** @} */
 
 	/**
 	 * @name Iterator support

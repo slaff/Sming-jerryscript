@@ -32,6 +32,20 @@ Version
 Configuration variables
 -----------------------
 
+.. envvar:: JERRY_ENABLE_DEBUG
+
+   default: 0 (disabled)
+
+   Enable assertions and debug messages in jerryscript library. This adds around 80KB to the program size.
+
+
+.. envvar:: JERRY_MEM_STATS
+
+   default: 1 (enabled)
+
+   Enable jerryscript heap memory tracking.
+
+
 .. envvar:: JERRY_COMPACT_PROFILE
 
    default: 1 (enabled)

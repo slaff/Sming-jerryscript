@@ -6,6 +6,7 @@ COMPONENT_DEPENDS := \
 APP_JS_SOURCE_DIR := files
 APP_JS_SNAP_UPDATED := touch modules/*
 JERRY_GLOBAL_HEAP_SIZE := 8
+JERRY_ENABLE_DEBUG := $(if $(SMING_RELEASE),0,1)
 
 # Don't need network
 HOST_NETWORK_OPTIONS := --nonet

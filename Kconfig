@@ -1,6 +1,22 @@
 menu "JerryScript"
     config JERRY_GLOBAL_HEAP_SIZE
         int "The size in kilobytes of the internal JerryScript heap"
+        default 1
+
     config JERRY_COMPACT_PROFILE
-    	bool "Use compact profile - no built-ins, no ES2015 and no unicode case conversion support."
+    	bool "Use compact profile"
+        default Y
+        help
+            No built-ins, no ES.next or unicode case conversion support.
+
+    config JERRY_ENABLE_DEBUG
+        bool "Enable assertions and debug messages in jerryscript library"
+        default N
+        help
+            This adds around 80KB to the program size.
+
+    config JERRY_MEM_STATS
+        bool "Enable jerryscript heap memory tracking"
+        default Y
+
 endmenu

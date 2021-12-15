@@ -242,31 +242,53 @@ public:
 	 * @name Construct a value from a simple type
 	 * @{
 	 */
+
+	/**
+	 * @brief Integer
+	 */
 	Value(int value) : Value(OwnedValue{ecma_make_int32_value(value)})
 	{
 	}
 
+	/**
+	 * @brief Unsigned integer
+	 */
 	Value(unsigned value) : Value(OwnedValue{ecma_make_uint32_value(value)})
 	{
 	}
 
+	/**
+	 * @brief floating-point
+	 */
 	Value(double value) : Value(OwnedValue{jerry_create_number(value)})
 	{
 	}
 
+	/**
+	 * @brief Boolean
+	 */
 	Value(bool value) : Value(OwnedValue{jerry_create_boolean(value)})
 	{
 	}
 
+	/**
+	 * @brief Wiring String
+	 */
 	Value(const String& s)
 		: Value(OwnedValue{jerry_create_string_sz(reinterpret_cast<const jerry_char_t*>(s.c_str()), s.length())})
 	{
 	}
 
+	/**
+	 * @brief NUL-terminated 'C' string
+	 */
 	Value(const char* s) : Value(OwnedValue{jerry_create_string(reinterpret_cast<const jerry_char_t*>(s))})
 	{
 	}
 
+	/**
+	 * @brief Flash String
+	 */
 	Value(const FSTR::String& s) : Value(String(s))
 	{
 	}
@@ -312,11 +334,18 @@ public:
 	 * @name Get raw/native value for use with jerryscript C API
 	 * @{
 	 */
+
+	/**
+	 * @brief const get()
+	 */
 	const jerry_value_t& get() const
 	{
 		return value;
 	}
 
+	/**
+	 * @brief get()
+	 */
 	jerry_value_t& get()
 	{
 		return value;
@@ -610,31 +639,59 @@ public:
 	 * @name Access object properties by name
 	 * @{
 	 */
+
+	/**
+	 * @brief operator[] uses `NamedItem` proxy object so value can be assigned or read
+	 */
 	NamedItem operator[](const String& name)
 	{
 		return NamedItem(*this, name);
 	}
 
+	/**
+	 * @brief const operator[] returns Value directly
+	 */
 	const Value operator[](const String& name) const
 	{
 		return getProperty(name);
 	}
 
+	/**
+	 * @brief Set a property value
+	 * @param name Property name
+	 * @param value Value to set
+	 * @retval Value true on success, otherwise Error
+	 */
 	Value setProperty(const Value& name, const Value& value)
 	{
 		return OwnedValue{jerry_set_property(get(), name.get(), value.get())};
 	}
 
+	/**
+	 * @brief Get a property value
+	 * @param name Property name
+	 * @retval Value The property value, or Error
+	 */
 	Value getProperty(const Value& name) const
 	{
 		return OwnedValue{jerry_get_property(get(), name.get())};
 	}
 
+	/**
+	 * @brief Determine if a property exists
+	 * @param name Property name
+	 * @retval bool true if property exists
+	 */
 	bool hasProperty(const Value& name) const
 	{
 		return jerry_has_property(get(), name.get());
 	}
 
+	/**
+	 * @brief Remove a property
+	 * @param name Property name
+	 * @retval bool true on success
+	 */
 	bool removeProperty(const Value& name)
 	{
 		return jerry_delete_property(get(), name.get());
@@ -702,10 +759,17 @@ public:
 	 * @name Create an error object
 	 * @{
 	 */
+
+	/**
+	 * @brief Error with type only
+	 */
 	Error(ErrorType type) : Value(OwnedValue{jerry_create_error_sz(jerry_error_t(type), nullptr, 0)})
 	{
 	}
 
+	/**
+	 * @brief Error with type and message
+	 */
 	Error(ErrorType type, const String& message)
 		: Value(OwnedValue{jerry_create_error_sz(
 			  jerry_error_t(type), reinterpret_cast<const jerry_char_t*>(message.c_str()), message.length())})
@@ -713,10 +777,16 @@ public:
 	}
 	/** @} */
 
+	/**
+	 * @brief Copy constructor
+	 */
 	Error(const Value& value) : Value(value)
 	{
 	}
 
+	/**
+	 * @brief Move constructor
+	 */
 	Error(Value&& value) : Value(std::move(value))
 	{
 	}
@@ -748,6 +818,9 @@ public:
 	operator String() const;
 };
 
+/**
+ * @brief Provides consistent error message when checking external function arguments
+ */
 class ArgumentError : public Error
 {
 public:
@@ -865,7 +938,7 @@ public:
 	}
 
 	/**
-	 * @name Get number of elements in the array
+	 * @brief Get number of elements in the array
 	 * @{
 	 */
 	size_t length() const
@@ -883,11 +956,14 @@ public:
 	 * @name Iterator support
 	 * @{
 	 */
+
+	/// begin
 	Iterator begin()
 	{
 		return Iterator(*this, 0);
 	}
 
+	/// end
 	Iterator end()
 	{
 		return Iterator(*this, count());
@@ -898,21 +974,39 @@ public:
 	 * @name Array element/property access by index
 	 * @{
 	 */
+
+	/**
+	 * @brief operator[] uses `IndexedItem` proxy object so value can be assigned or read
+	 */
 	IndexedItem operator[](unsigned index)
 	{
 		return IndexedItem(*this, index);
 	}
 
+	/**
+	 * @brief const operator[] returns value directly
+	 */
 	const Value operator[](unsigned index) const
 	{
 		return getProperty(index);
 	}
 
+	/**
+	 * @brief Get a property value
+	 * @param index Index of property
+	 * @retval Value The property value, or Error
+	 */
 	Value getProperty(unsigned index) const
 	{
 		return OwnedValue{jerry_get_property_by_index(get(), index)};
 	}
 
+	/**
+	 * @brief Set a property value
+	 * @param index Index of property
+	 * @param value Value to set
+	 * @retval Value true on success, otherwise Error
+	 */
 	Value setProperty(unsigned index, const Value& value)
 	{
 		return OwnedValue{jerry_set_property_by_index(get(), index, value.get())};
@@ -949,6 +1043,9 @@ public:
 			jerry_call_function(get(), thisValue.get(), args.size() ? &args.begin()->get() : nullptr, args.size())};
 	}
 
+	/**
+	 * @brief Get specific type of callable object
+	 */
 	FunctionType functionType() const
 	{
 		return FunctionType(jerry_function_get_type(get()));

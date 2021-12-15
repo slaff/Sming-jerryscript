@@ -15,6 +15,10 @@ using namespace Jerryscript;
 
 /**
  * @brief Function to register event listeners
+ *
+ * This example considers handling notifications from one or more temperature sensors,
+ * identified by the "origin" property.
+ *
  * @code {.javascript}
  * 
  * event = {
@@ -23,13 +27,13 @@ using namespace Jerryscript;
  *    },
  *    "origin" => "The\Creator\Of\The\Event" 
  * };
- * 
+ *
  * addEventListener("TEMP_CHANGE", function(event) {
  *      console.log("Got Event" + event.name);
  * });
- * 
+ *
  * @endcode
- * 
+ *
  */
 Value addEventListener(const CallInfo& callInfo, Value& eventName, Callable& function)
 {
@@ -85,7 +89,7 @@ void startJsvm()
 	 */
 	vm.registerFunction("addEventListener", addEventListener);
 
-	if(!vm.load(main_snap)) {
+	if(!JS::Snapshot::load(main_snap)) {
 		debug_e("Failed to load snapshot");
 		return;
 	}
@@ -100,8 +104,9 @@ void startJsvm()
 	 */
 	timer.initializeMs<2000>([]() {
 		JS::Object params;
-		params["temp"] = 20;
-		triggerEvent("EVENT_TEMP", params);
+		params["temp"] = int(random(25, 100));
+		params["origin"] = F("cpu/temp");
+		triggerEvent(F("EVENT_TEMP"), params);
 	});
 	timer.start();
 }

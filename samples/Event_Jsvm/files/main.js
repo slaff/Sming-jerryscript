@@ -14,9 +14,9 @@ function init() {
 
 	// This is how we register an event listener in JavaScript
 	addEventListener("EVENT_TEMP", function(event) {
-		// An event has a name and multiple params
-		// the params have string keys and string values
-		print('Event name: ' + event.name + ', value: ' + event.params['temp']);
+		// An event has a name and multiple params.
+		// The params have string keys, and values can be of any type.
+		print('Event name: ' + event.name + ', value: ' + event.params['temp'] + ', origin: ' + event.params.origin);
 	});
 
 	addEventListener("EVENT_TEMP", function(event) {
@@ -28,4 +28,3 @@ function init() {
 	// an anonymous function.
 	addEventListener("EVENT_TEMP", thirdListener);
 }
-

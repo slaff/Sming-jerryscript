@@ -127,17 +127,37 @@ Callable Object::getFunction(const String& name)
 	return func;
 }
 
-Value Object::runFunction(const String& name)
+static void dbgCheckCall(const String& name, const Value& res)
+{
+#if DEBUG_VERBOSE_LEVEL
+	if(res.isError()) {
+		debug_e("[JS] %s error calling '%s'", String(Error(res)).c_str(), name.c_str());
+	}
+#endif
+}
+
+Value Object::runFunction(const String& name, Value& arg)
 {
 	Callable func = getFunction(name);
 	if(func.isError()) {
 		return func;
 	}
 
-	auto res = func.call(*this);
-	if(res.isError()) {
-		debug_e("[JS] %s error calling '%s'", String(Error(res)).c_str(), name.c_str());
+	auto res = func.call(*this, arg);
+	dbgCheckCall(name, res);
+
+	return res;
+}
+
+Value Object::runFunction(const String& name, std::initializer_list<Value> args)
+{
+	Callable func = getFunction(name);
+	if(func.isError()) {
+		return func;
 	}
+
+	auto res = func.call(*this, args);
+	dbgCheckCall(name, res);
 
 	return res;
 }

@@ -647,11 +647,19 @@ public:
 	Array keys() const;
 
 	/**
-	 * @brief Runs a specified JavaScript function
+	 * @brief Call a specified JavaScript function with exactly one argument
+	 * @param name Name of function to run (a property name)
+	 * @param arg The argument
+	 * @retval Value Return value from function, or Error
+	 */
+	Value runFunction(const String& name, Value& arg);
+
+	/**
+	 * @brief Call a specified JavaScript function with zero or more arguments
 	 * @param name Name of function to run (a property name)
 	 * @retval Value Return value from function, or Error
 	 */
-	Value runFunction(const String& name);
+	Value runFunction(const String& name, std::initializer_list<Value> args = {});
 
 	/**
 	 * @brief Register an external function so it may be called from javascript
@@ -922,19 +930,23 @@ public:
 
 	using Object::Object;
 
-	Value call(const Object& thisValue)
-	{
-		return OwnedValue{jerry_call_function(get(), thisValue.get(), nullptr, 0)};
-	}
-
+	/**
+	 * @brief Call with one argument
+	 */
 	Value call(const Object& thisValue, const Value& arg)
 	{
 		return OwnedValue{jerry_call_function(get(), thisValue.get(), &const_cast<Value&>(arg).get(), 1)};
 	}
 
-	Value call(const Object& thisValue, std::initializer_list<Value> args)
+	/**
+	 * @brief Call with zero or multiple arguments
+	 *
+	 * e.g. `call(myObject, {1, 2, 3});`
+	 */
+	Value call(const Object& thisValue, std::initializer_list<Value> args = {})
 	{
-		return OwnedValue{jerry_call_function(get(), thisValue.get(), &args.begin()->get(), args.size())};
+		return OwnedValue{
+			jerry_call_function(get(), thisValue.get(), args.size() ? &args.begin()->get() : nullptr, args.size())};
 	}
 
 	FunctionType functionType() const

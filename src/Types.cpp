@@ -127,20 +127,19 @@ Callable Object::getFunction(const String& name)
 	return func;
 }
 
-bool Object::runFunction(const String& name)
+Value Object::runFunction(const String& name)
 {
 	Callable func = getFunction(name);
 	if(func.isError()) {
-		return false;
+		return func;
 	}
 
 	auto res = func.call(*this);
 	if(res.isError()) {
 		debug_e("[JS] %s error calling '%s'", String(Error(res)).c_str(), name.c_str());
-		return false;
 	}
 
-	return true;
+	return res;
 }
 
 Value Error::message() const

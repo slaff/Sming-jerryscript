@@ -649,9 +649,9 @@ public:
 	/**
 	 * @brief Runs a specified JavaScript function
 	 * @param name Name of function to run (a property name)
-	 * @retval bool true if the function exists and was called successfully
+	 * @retval Value Return value from function, or Error
 	 */
-	bool runFunction(const String& name);
+	Value runFunction(const String& name);
 
 	/**
 	 * @brief Register an external function so it may be called from javascript

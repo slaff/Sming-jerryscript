@@ -37,8 +37,9 @@ public:
 			realm.reset(new Object(global()));
 		}
 
-		if(!realm->runFunction("loop")) {
-			error = FS("Failed running loop function. Suspending task");
+		auto res = realm->runFunction("loop");
+		if(res.isError()) {
+			error = String(Error(res)) + FS(" error running loop function: Suspending task.");
 			suspend();
 			return;
 		}

@@ -26,7 +26,7 @@ void startJsvm()
 	}
 
 	// Now you can initialize your script by calling a setup() JavaScript function
-	if(!JS::global().runFunction("setup")) {
+	if(JS::global().runFunction("setup").isError()) {
 		debug_e("Failed executing the setup function.");
 	}
 

@@ -98,7 +98,7 @@ void startJsvm()
 	}
 
 	// Now you can initialize your script by calling the init() JavaScript function
-	if(!realm.runFunction("init")) {
+	if(realm.runFunction("init").isError()) {
 		debug_e("Failed executing the init function.");
 	}
 

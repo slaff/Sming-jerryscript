@@ -41,7 +41,7 @@ public:
 		{
 			REQUIRE(JS::Snapshot::load(eventSnap));
 			REQUIRE(realm.registerFunction("addEventListener", addEventListener));
-			REQUIRE(realm.runFunction("init"));
+			REQUIRE(!realm.runFunction("init").isError());
 		}
 
 		TEST_CASE("Create error")

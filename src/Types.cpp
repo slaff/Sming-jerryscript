@@ -129,7 +129,7 @@ Callable Object::getFunction(const String& name)
 
 static void dbgCheckCall(const String& name, const Value& res)
 {
-#if DEBUG_VERBOSE_LEVEL
+#if DEBUG_BUILD
 	if(res.isError()) {
 		debug_e("[JS] %s error calling '%s'", String(Error(res)).c_str(), name.c_str());
 	}

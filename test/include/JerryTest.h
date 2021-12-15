@@ -1,8 +1,6 @@
 #pragma once
 
-#ifndef DEBUG_VERBOSE_LEVEL
-#define DEBUG_VERBOSE_LEVEL 2
-#endif
+#define DEBUG_BUILD 1
 
 #include <Jerryscript.h>
 #include <SmingTest.h>

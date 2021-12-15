@@ -86,10 +86,40 @@ index 152909a6..200f61d7 100644
  
  /**
 diff --git a/jerry-core/jrt/jrt.h b/jerry-core/jrt/jrt.h
-index ffd4bde3..e119b2c8 100644
+index ffd4bde3..dc0ee760 100644
 --- a/jerry-core/jrt/jrt.h
 +++ b/jerry-core/jrt/jrt.h
-@@ -120,10 +120,10 @@ void JERRY_ATTR_NORETURN jerry_fatal (jerry_fatal_code_t code);
+@@ -24,6 +24,12 @@
+ #include "config.h"
+ #include "jrt-types.h"
+ 
++#ifdef SMING_ARCH
++#include <FakePgmSpace.h>
++#else
++#define _F(x) x
++#endif
++
+ /*
+  * Constants
+  */
+@@ -78,14 +84,14 @@ void JERRY_ATTR_NORETURN jerry_unreachable (const char *file, const char *functi
+   {                                                         \
+     if (JERRY_UNLIKELY (!(x)))                              \
+     {                                                       \
+-      jerry_assert_fail (#x, __FILE__, __func__, __LINE__); \
++      jerry_assert_fail (_F(#x), _F(__FILE__), __func__, __LINE__); \
+     }                                                       \
+   } while (0)
+ 
+ #define JERRY_UNREACHABLE()                           \
+   do                                                  \
+   {                                                   \
+-    jerry_unreachable (__FILE__, __func__, __LINE__); \
++    jerry_unreachable (_F(__FILE__), __func__, __LINE__); \
+   } while (0)
+ #else /* JERRY_NDEBUG */
+ #define JERRY_ASSERT(x) \
+@@ -120,10 +126,10 @@ void JERRY_ATTR_NORETURN jerry_fatal (jerry_fatal_code_t code);
   * Logging
   */
  #if JERRY_LOGGING
@@ -97,10 +127,30 @@ index ffd4bde3..e119b2c8 100644
 -#define JERRY_WARNING_MSG(...) jerry_port_log (JERRY_LOG_LEVEL_WARNING, __VA_ARGS__)
 -#define JERRY_DEBUG_MSG(...)   jerry_port_log (JERRY_LOG_LEVEL_DEBUG, __VA_ARGS__)
 -#define JERRY_TRACE_MSG(...)   jerry_port_log (JERRY_LOG_LEVEL_TRACE, __VA_ARGS__)
-+#define JERRY_ERROR_MSG(fmt, ...)   jerry_port_log (JERRY_LOG_LEVEL_ERROR, _F(fmt), __VA_ARGS__)
-+#define JERRY_WARNING_MSG(fmt, ...) jerry_port_log (JERRY_LOG_LEVEL_WARNING, _F(fmt), __VA_ARGS__)
-+#define JERRY_DEBUG_MSG(fmt, ...)   jerry_port_log (JERRY_LOG_LEVEL_DEBUG, _F(fmt), __VA_ARGS__)
-+#define JERRY_TRACE_MSG(fmt, ...)   jerry_port_log (JERRY_LOG_LEVEL_TRACE, _F(fmt), __VA_ARGS__)
++#define JERRY_ERROR_MSG(fmt, ...)   jerry_port_log (JERRY_LOG_LEVEL_ERROR, _F(fmt), ##__VA_ARGS__)
++#define JERRY_WARNING_MSG(fmt, ...) jerry_port_log (JERRY_LOG_LEVEL_WARNING, _F(fmt), ##__VA_ARGS__)
++#define JERRY_DEBUG_MSG(fmt, ...)   jerry_port_log (JERRY_LOG_LEVEL_DEBUG, _F(fmt), ##__VA_ARGS__)
++#define JERRY_TRACE_MSG(fmt, ...)   jerry_port_log (JERRY_LOG_LEVEL_TRACE, _F(fmt), ##__VA_ARGS__)
  #else /* !JERRY_LOGGING */
  #define JERRY_ERROR_MSG(...)          \
    do                                  \
+diff --git a/jerry-core/api/jerry-snapshot.c b/jerry-core/api/jerry-snapshot.c
+index 19ec199f..fd578b2a 100644
+--- a/jerry-core/api/jerry-snapshot.c
++++ b/jerry-core/api/jerry-snapshot.c
+@@ -33,6 +33,7 @@
+ 
+ #if JERRY_SNAPSHOT_SAVE || JERRY_SNAPSHOT_EXEC
+ 
++#if JERRY_SNAPSHOT_SAVE
+ /**
+  * Create an error object
+  *
+@@ -49,6 +50,7 @@ jerry_create_error_from_id (jerry_error_t error_type, /**< type of error */
+ {
+   return jerry_create_error (error_type, (jerry_char_t *) ecma_get_error_utf8 (msg));
+ } /* jerry_create_error_from_id */
++#endif
+ 
+ /**
+  * Get snapshot configuration flags.

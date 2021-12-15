@@ -17,85 +17,66 @@
 namespace Jerryscript
 {
 /**
- * @brief JavaScriptVM for Sming
+* @brief Initializes the JavaScript VM
+*/
+void initialise(jerry_init_flag_t flags = JERRY_INIT_EMPTY);
+
+/**
+ * @brief Clean up the virtual machine by unloading snapshots, freeing allocated memory, etc.
+ *
+ * Note that this does not release Jerryscript heap memory allocated to existing values.
+ * This is done via `Value` destructor or by manually calling `Value::reset()`.
  */
-class VirtualMachine
+void cleanup();
+
+/*
+ * @brief Parses the JavaScript code and prepares it for execution
+ * @retval bool true on success
+ */
+bool eval(const String& jsCode);
+
+/**
+ * @brief Snapshot management functions
+ */
+namespace Snapshot
 {
-public:
-	/**
-	* @brief Initializes the JavaScript VM
-	*/
-	VirtualMachine(jerry_init_flag_t flags = JERRY_INIT_EMPTY);
+/**
+ * @name Load a snapshot into the virtual machine
+ * @brief Load from memory buffer
+ * @param snapshot Points to snapshot content
+ * @param snapshotSize Number of bytes in snapshot
+ * @retval bool true on success
+ * @{
+ */
+bool load(const uint32_t* snapshot, size_t snapshotSize);
 
-	~VirtualMachine();
+/**
+ * @brief Load from String
+ */
+inline bool load(const String& snapshot)
+{
+	return load(reinterpret_cast<const uint32_t*>(snapshot.c_str()), snapshot.length());
+}
 
-	/*
-	 * @brief Parses the JavaScript code and prepares it for execution
-	 * @retval bool true on success
-	 */
-	bool eval(const String& jsCode);
+/**
+ * @brief Load a snapshot from file and execute it
+ * @param fileName Path to snapshot file
+ * @retval bool true on success
+ */
+inline bool loadFromFile(const String& fileName)
+{
+	return load(fileGetContent(fileName));
+}
+/** @} */
 
-	/**
-	 * @brief Loads a snapshot from file and executes it.
-	 * @param fileName Path to snapshot file
-	 * @retval bool true on success
-	 */
-	bool loadFromFile(const String& fileName)
-	{
-		return load(fileGetContent(fileName));
-	}
+} // namespace Snapshot
 
-	/**
-	 * @name Load a snapshot into the virtual machine
-	 * @param snapshot Points to snapshot content
-	 * @param snapshotSize Number of bytes in snapshot
-	 * @retval bool true on success
-	 * @{
-	 */
-	bool load(const uint32_t* snapshot, size_t snapshotSize);
-
-	bool load(const String& snapshot)
-	{
-		return load(reinterpret_cast<const uint32_t*>(snapshot.c_str()), snapshot.length());
-	}
-	/** @} */
-
-	/**
-	 * @brief Runs a specified JavaScript function
-	 * @param functionName Name of function to run
-	 * @retval bool true if the function exists and was called successfully
-	 */
-	bool runFunction(const String& functionName);
-
-	/**
-	 * @brief Register an external function so it may be called from javascript
-	 * @param name Name of the function
-	 * @param handler The function handler, see Function.h for details
-	 * @param bool true on success
-	 */
-	bool registerFunction(const String& name, jerry_external_handler_t handler)
-	{
-		auto res = global().setProperty(name, ExternalFunction(handler));
-		return !res.isError();
-	}
-
-	/**
-	 * @brief Unregister an external function
-	 * @param name Name of the function
-	 * @param bool true on success
-	 */
-	bool unregisterFunction(const String& name)
-	{
-		return global().removeProperty(name);
-	}
-
-	/**
-	 * @brief Perform memory garbage collection
-	 */
-	void gc(bool maximumEffort = false)
-	{
-		jerry_gc(maximumEffort ? JERRY_GC_PRESSURE_HIGH : JERRY_GC_PRESSURE_LOW);
-	}
-};
+/**
+ * @brief Perform memory garbage collection
+ */
+inline void gc(bool maximumEffort = false)
+{
+	jerry_gc(maximumEffort ? JERRY_GC_PRESSURE_HIGH : JERRY_GC_PRESSURE_LOW);
+}
 
 } // namespace Jerryscript

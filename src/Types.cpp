@@ -11,6 +11,7 @@
  */
 
 #include "include/Jerryscript/Types.h"
+#include <debug_progmem.h>
 
 String toString(Jerryscript::Type type)
 {
@@ -108,6 +109,38 @@ Value::operator String() const
 Array Object::keys() const
 {
 	return OwnedValue{jerry_get_object_keys(get())};
+}
+
+Callable Object::getFunction(const String& name)
+{
+	Callable func = getProperty(name);
+	if(func.isError()) {
+		debug_e("[JS] %s error: '%s' not found", String(Error(func)).c_str(), name.c_str());
+		return func;
+	}
+
+	if(!func.isCallable()) {
+		debug_e("[JS] error '%s': not a function", name.c_str());
+		return Error(ErrorType::Type, F("Not Callable"));
+	}
+
+	return func;
+}
+
+bool Object::runFunction(const String& name)
+{
+	Callable func = getFunction(name);
+	if(func.isError()) {
+		return false;
+	}
+
+	auto res = func.call(*this);
+	if(res.isError()) {
+		debug_e("[JS] %s error calling '%s'", String(Error(res)).c_str(), name.c_str());
+		return false;
+	}
+
+	return true;
 }
 
 Value Error::message() const

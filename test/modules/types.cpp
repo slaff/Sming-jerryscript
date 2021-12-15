@@ -12,7 +12,7 @@ public:
 
 	void execute() override
 	{
-		JS::VirtualMachine vm;
+		JS::initialise();
 
 		// Initialise some intrinsics which don't get tidied by garbage collection
 		{
@@ -21,7 +21,7 @@ public:
 			JS::Object().keys();
 		}
 
-		vm.gc();
+		JS::gc();
 		auto initialHeapUsed = JS::getHeapUsed();
 
 		TEST_CASE("Object properties")
@@ -71,9 +71,11 @@ public:
 				JS::Value value(F("Test string allocated/deallocated multiple times"));
 			}
 
-			vm.gc();
+			JS::gc();
 			REQUIRE_EQ(JS::getHeapUsed(), initialHeapUsed);
 		}
+
+		JS::cleanup();
 	}
 
 	template <typename T> void testNumber(const String& type, T min, T max)

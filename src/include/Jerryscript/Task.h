@@ -22,13 +22,22 @@ namespace Jerryscript
 class Task : public ::Task
 {
 public:
-	Task(VirtualMachine& jsvm, unsigned intervalMs = 500) : jsvm(jsvm), intervalMs(intervalMs)
+	Task(const Object& realm, unsigned intervalMs = 500) : intervalMs(intervalMs)
+	{
+		this->realm.reset(new Object(realm));
+	}
+
+	Task(unsigned intervalMs = 500) : intervalMs(intervalMs)
 	{
 	}
 
 	void loop() override
 	{
-		if(!jsvm.runFunction("loop")) {
+		if(!realm) {
+			realm.reset(new Object(global()));
+		}
+
+		if(!realm->runFunction("loop")) {
 			error = FS("Failed running loop function. Suspending task");
 			suspend();
 			return;
@@ -50,7 +59,7 @@ public:
 	}
 
 private:
-	VirtualMachine& jsvm;
+	std::unique_ptr<Object> realm;
 	unsigned intervalMs;
 	String error;
 };

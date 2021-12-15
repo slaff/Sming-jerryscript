@@ -33,13 +33,15 @@ public:
 
 	void execute() override
 	{
-		vm.reset(new JS::VirtualMachine);
+		JS::initialise();
+
+		auto realm = JS::global();
 
 		TEST_CASE("Start VM")
 		{
-			REQUIRE(vm->load(eventSnap));
-			REQUIRE(vm->registerFunction("addEventListener", addEventListener));
-			REQUIRE(vm->runFunction("init"));
+			REQUIRE(JS::Snapshot::load(eventSnap));
+			REQUIRE(realm.registerFunction("addEventListener", addEventListener));
+			REQUIRE(realm.runFunction("init"));
 		}
 
 		TEST_CASE("Create error")
@@ -61,7 +63,6 @@ public:
 			event["name"] = testEventName;
 			event["params"] = params;
 
-			auto realm = JS::global();
 			JS::Object arg2;
 			JS::Value res;
 			JS::Value prop;
@@ -94,15 +95,13 @@ public:
 
 		TEST_CASE("Shutdown VM")
 		{
+			realm.reset();
 			events.clear();
-			vm.reset();
+			JS::cleanup();
 
 			REQUIRE_EQ(JS::getHeapUsed(), 0);
 		}
 	}
-
-private:
-	std::unique_ptr<JS::VirtualMachine> vm;
 };
 
 } // namespace

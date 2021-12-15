@@ -155,6 +155,7 @@ struct Null {
 
 class Object;
 class Array;
+class Callable;
 
 /**
  * @brief Represents a Jerryscript value
@@ -533,6 +534,17 @@ private:
 };
 
 /**
+ * @brief Object representing an external function implementation
+ */
+class ExternalFunction : public Value
+{
+public:
+	ExternalFunction(jerry_external_handler_t handler) : Value(OwnedValue{jerry_create_external_function(handler)})
+	{
+	}
+};
+
+/**
  * @brief Objects support named properties
  */
 class Object : public Value
@@ -633,6 +645,41 @@ public:
 	 * @brief Get list of property names
 	 */
 	Array keys() const;
+
+	/**
+	 * @brief Runs a specified JavaScript function
+	 * @param name Name of function to run (a property name)
+	 * @retval bool true if the function exists and was called successfully
+	 */
+	bool runFunction(const String& name);
+
+	/**
+	 * @brief Register an external function so it may be called from javascript
+	 * @param name Name of the function (property name)
+	 * @param handler The function handler, see Function.h for details
+	 * @param bool true on success
+	 */
+	bool registerFunction(const String& name, jerry_external_handler_t handler)
+	{
+		auto res = setProperty(name, ExternalFunction(handler));
+		return !res.isError();
+	}
+
+	/**
+	 * @brief Unregister an external function
+	 * @param name Name of the function
+	 * @param bool true on success
+	 */
+	bool unregisterFunction(const String& name)
+	{
+		return removeProperty(name);
+	}
+
+	/**
+	 * @brief Retrieve the given property as a function
+	 * @retval The callable object, or error (property not found or isn't callable)
+	 */
+	Callable getFunction(const String& name);
 };
 
 /**
@@ -893,14 +940,6 @@ public:
 	FunctionType functionType() const
 	{
 		return FunctionType(jerry_function_get_type(get()));
-	}
-};
-
-class ExternalFunction : public Value
-{
-public:
-	ExternalFunction(jerry_external_handler_t handler) : Value(OwnedValue{jerry_create_external_function(handler)})
-	{
 	}
 };
 

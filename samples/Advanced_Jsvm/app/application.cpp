@@ -11,23 +11,22 @@
 
 namespace
 {
-JS::VirtualMachine vm;
-JS::Task task(vm);
-
+JS::Task task;
 HttpServer webServer;
-
 DEFINE_FSTR(MAIN_JS_FILE, "main.js.snap");
 
 void startJsvm()
 {
+	JS::initialise();
+
 	// Load the snapshot file
-	if(!vm.loadFromFile(MAIN_JS_FILE)) {
+	if(!JS::Snapshot::loadFromFile(MAIN_JS_FILE)) {
 		debug_e("Failed executing the following script: %s", String(MAIN_JS_FILE).c_str());
 		return;
 	}
 
 	// Now you can initialize your script by calling a setup() JavaScript function
-	if(!vm.runFunction("setup")) {
+	if(!JS::global().runFunction("setup")) {
 		debug_e("Failed executing the setup function.");
 	}
 

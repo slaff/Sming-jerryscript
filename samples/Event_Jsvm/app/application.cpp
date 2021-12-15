@@ -3,7 +3,6 @@
 
 namespace
 {
-JS::VirtualMachine vm;
 SimpleTimer timer;
 HashMap<String, JS::Callable::List> events;
 
@@ -83,11 +82,15 @@ bool triggerEvent(const String& name, const JS::Object& params)
 
 void startJsvm()
 {
+	JS::initialise();
+
+	auto realm = JS::global();
+
 	/*
 	 * This is how we register a new function in JavaScript
 	 * that will communicate directly with our C/C++ code.
 	 */
-	vm.registerFunction("addEventListener", addEventListener);
+	realm.registerFunction("addEventListener", addEventListener);
 
 	if(!JS::Snapshot::load(main_snap)) {
 		debug_e("Failed to load snapshot");
@@ -95,7 +98,7 @@ void startJsvm()
 	}
 
 	// Now you can initialize your script by calling the init() JavaScript function
-	if(!vm.runFunction("init")) {
+	if(!realm.runFunction("init")) {
 		debug_e("Failed executing the init function.");
 	}
 

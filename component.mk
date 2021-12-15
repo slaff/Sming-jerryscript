@@ -8,11 +8,12 @@ COMPONENT_SRCDIRS := \
 	$(call ListAllSubDirs,$(JERRYSCRIPT_ROOT)/jerry-core)
 
 COMPONENT_INCDIRS := \
-	src/include jerryscript \
+	src/include \
 	$(JERRYSCRIPT_ROOT)/jerry-core \
 	$(COMPONENT_SRCDIRS)
 
 COMPONENT_DOCFILES := jerryscript/docs/img/engines_high_level_design.png
+COMPONENT_DOXYGEN_INPUT := src/include
 
 # The size of the JerryScript engine heap. The size in kilobytes is allocated once and defined at compile time.
 COMPONENT_VARS := JERRY_GLOBAL_HEAP_SIZE
@@ -29,9 +30,6 @@ JERRY_COMPILER_FLAGS := \
 	JERRY_BUILTINS=0 \
 	JERRY_ESNEXT=0 \
 	JERRY_UNICODE_CASE_CONVERSION=0
-# Just for library
-COMPONENT_CFLAGS += \
-	-DJERRY_NUMBER_TYPE_FLOAT64=0
 else
 JERRY_PROFILE := es.next
 endif
@@ -44,8 +42,14 @@ COMPONENT_CFLAGS += \
 	-DJERRY_LCACHE=0  \
 	-DJERRY_PARSER=0 \
 	-DJERRY_SNAPSHOT_EXEC=1 \
-	-DJERRY_NDEBUG \
 	$(addprefix -D,$(JERRY_COMPILER_FLAGS))
+
+ifndef SMING_RELEASE
+	COMPONENT_CFLAGS += \
+		-DJERRY_NDEBUG \
+		-DJERRY_LOGGING=1 \
+		-DJERRY_MEM_STATS=1
+endif
 
 # Build version of tool compatible with library
 DEBUG_VARS += JERRY_SNAPSHOT_TOOL
@@ -56,9 +60,8 @@ ifeq ($(UNAME),Windows)
 JERRY_CMAKE_PARAMS := \
 	--cmake-param "-GMSYS Makefiles" \
 	--compile-flag "-I $(JERRYSCRIPT_ROOT)/../src/include" \
-	--compile-flag "-std=gnu11 " \
 	--compile-flag "-Wno-error=unused-parameter " \
-	--compile-flag "-D_POSIX_C_SOURCE=1 "
+	--compile-flag "-D_POSIX_C_SOURCE=1 -U__STRICT_ANSI__"
 endif
 
 $(JERRY_SNAPSHOT_TOOL):
@@ -89,7 +92,7 @@ COMPONENT_PREREQUISITES := $(APP_JS_SNAP_FILES)
 
 $(APP_JS_SNAP_FILES): $(JERRY_SNAPSHOT_TOOL) $(addprefix $(APP_JS_SOURCE_DIR)/,$(APP_JS_SOURCE_FILES)) | $(APP_JS_SNAP_DIR)
 	$(Q) $(JERRY_SNAPSHOT_TOOL) generate $(APP_JS_SOURCE_DIR)/$(@F:.snap=) -o $@
-	$(APP_JS_SNAP_UPDATED)
+	$(Q) $(APP_JS_SNAP_UPDATED)
 
 $(APP_JS_SNAP_DIR):
 	mkdir -p $@

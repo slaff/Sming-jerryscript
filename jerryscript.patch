@@ -65,3 +65,42 @@ index 13e3fd65..32444cd6 100644
  
    ecma_extended_object_t *ext_object_p = (ecma_extended_object_t *) object_p;
  
+diff --git a/jerry-core/jmem/jmem-heap.c b/jerry-core/jmem/jmem-heap.c
+index 152909a6..200f61d7 100644
+--- a/jerry-core/jmem/jmem-heap.c
++++ b/jerry-core/jmem/jmem-heap.c
+@@ -734,6 +734,7 @@ jmem_heap_get_stats (jmem_heap_stats_t *out_heap_stats_p) /**< [out] heap stats
+ void
+ jmem_heap_stats_print (void)
+ {
++#if 0
+   jmem_heap_stats_t *heap_stats = &JERRY_CONTEXT (jmem_heap_stats);
+ 
+   JERRY_DEBUG_MSG ("Heap stats:\n");
+@@ -764,6 +765,7 @@ jmem_heap_stats_print (void)
+                    heap_stats->peak_object_bytes,
+                    heap_stats->property_bytes,
+                    heap_stats->peak_property_bytes);
++#endif
+ } /* jmem_heap_stats_print */
+ 
+ /**
+diff --git a/jerry-core/jrt/jrt.h b/jerry-core/jrt/jrt.h
+index ffd4bde3..e119b2c8 100644
+--- a/jerry-core/jrt/jrt.h
++++ b/jerry-core/jrt/jrt.h
+@@ -120,10 +120,10 @@ void JERRY_ATTR_NORETURN jerry_fatal (jerry_fatal_code_t code);
+  * Logging
+  */
+ #if JERRY_LOGGING
+-#define JERRY_ERROR_MSG(...)   jerry_port_log (JERRY_LOG_LEVEL_ERROR, __VA_ARGS__)
+-#define JERRY_WARNING_MSG(...) jerry_port_log (JERRY_LOG_LEVEL_WARNING, __VA_ARGS__)
+-#define JERRY_DEBUG_MSG(...)   jerry_port_log (JERRY_LOG_LEVEL_DEBUG, __VA_ARGS__)
+-#define JERRY_TRACE_MSG(...)   jerry_port_log (JERRY_LOG_LEVEL_TRACE, __VA_ARGS__)
++#define JERRY_ERROR_MSG(fmt, ...)   jerry_port_log (JERRY_LOG_LEVEL_ERROR, _F(fmt), __VA_ARGS__)
++#define JERRY_WARNING_MSG(fmt, ...) jerry_port_log (JERRY_LOG_LEVEL_WARNING, _F(fmt), __VA_ARGS__)
++#define JERRY_DEBUG_MSG(fmt, ...)   jerry_port_log (JERRY_LOG_LEVEL_DEBUG, _F(fmt), __VA_ARGS__)
++#define JERRY_TRACE_MSG(fmt, ...)   jerry_port_log (JERRY_LOG_LEVEL_TRACE, _F(fmt), __VA_ARGS__)
+ #else /* !JERRY_LOGGING */
+ #define JERRY_ERROR_MSG(...)          \
+   do                                  \

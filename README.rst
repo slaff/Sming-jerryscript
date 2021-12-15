@@ -67,3 +67,9 @@ Credits
 
 The initial work on the JerryScript library for Sming was done as part of the `U:Kit project <https://github.com/attachix/ukit>`_. 
 
+
+API Documentation
+-----------------
+
+.. doxygennamespace:: Jerryscript
+   :members:

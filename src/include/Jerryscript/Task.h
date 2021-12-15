@@ -4,7 +4,7 @@
  * http://github.com/SmingHub/Sming
  * All files of the Sming Core are provided under the LGPL v3 license.
  *
- * JsvmTask.h
+ * Task.h
  *
  * @author Nov 2021 - Slavey Karadzhov <slav@attachix.com>
  */
@@ -12,22 +12,24 @@
 #pragma once
 
 #include <Task.h>
-#include "include/Jsvm.h"
+#include "VirtualMachine.h"
 
+namespace Jerryscript
+{
 /**
  * @brief - Task that runs the `loop` JavaScript function in the background
  */
-class JsvmTask : public Task
+class Task : public ::Task
 {
 public:
-	JsvmTask(Jsvm& jsvm, unsigned intervalMs = 500) : jsvm(jsvm), intervalMs(intervalMs)
+	Task(VirtualMachine& jsvm, unsigned intervalMs = 500) : jsvm(jsvm), intervalMs(intervalMs)
 	{
 	}
 
 	void loop() override
 	{
 		if(!jsvm.runFunction("loop")) {
-			error = F("Failed running loop function. Suspending task");
+			error = FS("Failed running loop function. Suspending task");
 			suspend();
 			return;
 		}
@@ -48,7 +50,9 @@ public:
 	}
 
 private:
-	Jsvm& jsvm;
+	VirtualMachine& jsvm;
 	unsigned intervalMs;
 	String error;
 };
+
+} // namespace Jerryscript

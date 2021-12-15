@@ -9,3 +9,5 @@ APP_JS_SNAP_UPDATED := touch app/application.cpp
 
 # We need more heap to run this sample. The default heap is 1Kilobyte, we will use 2K
 JERRY_GLOBAL_HEAP_SIZE := 2
+
+DISABLE_NETWORK := 1

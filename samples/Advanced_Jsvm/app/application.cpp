@@ -2,7 +2,7 @@
 #include <MultipartParser.h>
 #include <HttpMultipartResource.h>
 #include <Data/Stream/FileStream.h>
-#include <JsvmTask.h>
+#include <Jerryscript.h>
 
 #ifndef WIFI_SSID
 #define WIFI_SSID "PleaseEnterSSID"
@@ -11,23 +11,23 @@
 
 namespace
 {
-Jsvm jsVm;
-JsvmTask jsTask(jsVm);
+JS::VirtualMachine vm;
+JS::Task task(vm);
 
 HttpServer webServer;
 
-constexpr char MAIN_JS_FILE[]{"main.js.snap"};
+DEFINE_FSTR(MAIN_JS_FILE, "main.js.snap");
 
 void startJsvm()
 {
 	// Load the snapshot file
-	if(!jsVm.loadFromFile(MAIN_JS_FILE)) {
-		debug_e("Failed executing the following script: %s", MAIN_JS_FILE);
+	if(!vm.loadFromFile(MAIN_JS_FILE)) {
+		debug_e("Failed executing the following script: %s", String(MAIN_JS_FILE).c_str());
 		return;
 	}
 
 	// Now you can initialize your script by calling a setup() JavaScript function
-	if(!jsVm.runFunction("setup")) {
+	if(!vm.runFunction("setup")) {
 		debug_e("Failed executing the setup function.");
 	}
 
@@ -39,7 +39,7 @@ void onIndex(HttpRequest& request, HttpResponse& response)
 	if(request.method == HTTP_POST) {
 		debug_d("Successful post request...");
 	}
-	response.sendFile("index.html");
+	response.sendFile(F("index.html"));
 }
 
 void onTask(HttpRequest& request, HttpResponse& response)
@@ -52,10 +52,10 @@ void onTask(HttpRequest& request, HttpResponse& response)
 
 	if(runTask == "0") {
 		body = F("{\"status\": \"stopped\"}");
-		jsTask.suspend();
+		task.suspend();
 	} else {
 		body = F("{\"status\": \"running\"}");
-		jsTask.resume();
+		task.resume();
 	}
 
 	response.headers[HTTP_HEADER_CONTENT_TYPE] = toString(MIME_JSON);
@@ -90,7 +90,7 @@ int onUpload(HttpServerConnection& connection, HttpRequest& request, HttpRespons
 	String body = F("{\"status\": \"failed\"}");
 	if(response.isSuccess()) {
 		body = F("{\"status\": \"ok\"}");
-		jsTask.suspend();
+		task.suspend();
 	}
 	response.headers[HTTP_HEADER_CONTENT_TYPE] = toString(MIME_JSON);
 	response.sendString(body);

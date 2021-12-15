@@ -10,71 +10,52 @@
  */
 
 #include "jsvm-ext.h"
-
 #include <m_printf.h>
 
-#define jerryx_port_handler_print_char(A) m_putc(A)
+using namespace Jerryscript;
 
-jerry_value_t alertFunction(const jerry_call_info_t *call_info_p,
-							const jerry_value_t args_p[], const jerry_length_t args_count)
+namespace JS
 {
-	jerry_value_t str_val = jerry_value_to_string(args_p[0]);
-
-	jerry_size_t req_sz = jerry_get_string_size(str_val);
-	jerry_char_t str_buf_p[req_sz + 1];
-
-	jerry_string_to_char_buffer(str_val, str_buf_p, req_sz);
-	str_buf_p[req_sz] = '\0';
-
-	m_printf("%s", (char*)str_buf_p);
-	jerry_release_value(str_val);
-
-	return jerry_create_boolean(true);
+Value alertFunction(const CallInfo& callInfo, Value& str)
+{
+	String s = str.toString();
+	m_nputs(s.c_str(), s.length());
+	m_putc('\n');
+	return true;
 }
 
-jerry_value_t printFunction(const jerry_call_info_t *call_info_p,
-							const jerry_value_t args_p[], const jerry_length_t args_count)
+Value printFunction(const CallInfo&, Value args[], unsigned argCount)
 {
-	static const char* null_str = "\\u0000";
-	jerry_length_t arg_index = 0;
+	Value ret_val = Undefined{};
 
-	jerry_value_t ret_val = jerry_create_undefined();
-
-	for(arg_index = 0; jerry_value_is_undefined(ret_val) && arg_index < args_count; arg_index++) {
-		jerry_value_t str_val = jerry_value_to_string(args_p[arg_index]);
-
-		if(!jerry_value_is_error(str_val)) {
-			if(arg_index != 0) {
-				jerryx_port_handler_print_char(' ');
-			}
-
-			jerry_size_t substr_size;
-			jerry_length_t substr_pos = 0;
-			jerry_char_t substr_buf[256];
-
-			while((substr_size =
-					   jerry_substring_to_char_buffer(str_val, substr_pos, substr_pos + 256, substr_buf, 256)) != 0) {
-				for(jerry_size_t chr_index = 0; chr_index < substr_size; chr_index++) {
-					char chr = (char)substr_buf[chr_index];
-					if(chr == '\0') {
-						for(jerry_size_t null_index = 0; null_str[null_index] != 0; null_index++) {
-							jerryx_port_handler_print_char(null_str[null_index]);
-						}
-					} else {
-						jerryx_port_handler_print_char(chr);
-					}
-				}
-
-				substr_pos += substr_size;
-			}
-
-			jerry_release_value(str_val);
-		} else {
+	for(unsigned i = 0; i < argCount; i++) {
+		Value str_val = args[i].toString();
+		if(str_val.isError()) {
 			ret_val = str_val;
+			break;
+		}
+
+		if(i != 0) {
+			m_putc(' ');
+		}
+
+		constexpr size_t bufSize{256};
+		jerry_length_t pos{0};
+		char buffer[bufSize];
+
+		size_t len;
+		while((len = str_val.readString(pos, buffer, bufSize)) != 0) {
+			m_nputs(buffer, len);
+			pos += len;
 		}
 	}
 
-	jerryx_port_handler_print_char('\n');
+	m_putc('\n');
 
 	return ret_val;
 }
+
+} // namespace JS
+
+JS_DEFINE_FUNCTION(alertFunction, 1)
+JS_DEFINE_FUNCTION_VAR(printFunction)

@@ -32,6 +32,41 @@ Version
 Configuration variables
 -----------------------
 
+.. envvar:: JERRY_ENABLE_DEBUG
+
+   default: 0 (disabled)
+
+   Enable assertions and debug messages in jerryscript library. This adds around 80KB to the program size.
+
+
+.. envvar:: JERRY_MEM_STATS
+
+   default: 1 (enabled)
+
+   Enable jerryscript heap memory tracking.
+
+
+.. envvar:: JERRY_COMPACT_PROFILE
+
+   default: 1 (enabled)
+
+   Compact (minimal profile) compilation profile makes the JerryScript library smaller.
+
+   Set to 0 to use es.next profile.
+
+
+.. envvar:: JERRY_GLOBAL_HEAP_SIZE
+
+   default: 1 (in KB)
+
+   Size of the jerryscript global heap in kilobytes. Increase as required.
+
+
+.. envvar:: JERRY_SNAPSHOT_TOOL
+
+   Read-only. Path to the snapshot compiler for use by applications.
+
+
 .. envvar:: APP_JS_SOURCE_DIR
 
     default: undefined
@@ -49,11 +84,13 @@ Configuration variables
 
     Location to write generated .snap files.
 
+
 .. envvar:: APP_JS_SNAP_UPDATED
 
     default: undefined
 
     Set this if action required when snaps are updated, for example to rebuild SPIFFS image or update application.
+
 
 .. envvar:: JERRY_WEB_COMPILER
 

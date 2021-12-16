@@ -11,6 +11,7 @@
  */
 
 #include "include/Jerryscript/Types.h"
+#include <debug_progmem.h>
 
 String toString(Jerryscript::Type type)
 {
@@ -108,6 +109,57 @@ Value::operator String() const
 Array Object::keys() const
 {
 	return OwnedValue{jerry_get_object_keys(get())};
+}
+
+Callable Object::getFunction(const String& name)
+{
+	Callable func = getProperty(name);
+	if(func.isError()) {
+		debug_e("[JS] %s error: '%s' not found", String(Error(func)).c_str(), name.c_str());
+		return func;
+	}
+
+	if(!func.isCallable()) {
+		debug_e("[JS] error '%s': not a function", name.c_str());
+		return Error(ErrorType::Type, F("Not Callable"));
+	}
+
+	return func;
+}
+
+static void dbgCheckCall(const String& name, const Value& res)
+{
+#if DEBUG_BUILD
+	if(res.isError()) {
+		debug_e("[JS] %s error calling '%s'", String(Error(res)).c_str(), name.c_str());
+	}
+#endif
+}
+
+Value Object::runFunction(const String& name, Value& arg)
+{
+	Callable func = getFunction(name);
+	if(func.isError()) {
+		return func;
+	}
+
+	auto res = func.call(*this, arg);
+	dbgCheckCall(name, res);
+
+	return res;
+}
+
+Value Object::runFunction(const String& name, std::initializer_list<Value> args)
+{
+	Callable func = getFunction(name);
+	if(func.isError()) {
+		return func;
+	}
+
+	auto res = func.call(*this, args);
+	dbgCheckCall(name, res);
+
+	return res;
 }
 
 Value Error::message() const

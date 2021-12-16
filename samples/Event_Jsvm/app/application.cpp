@@ -3,7 +3,6 @@
 
 namespace
 {
-JS::VirtualMachine vm;
 SimpleTimer timer;
 HashMap<String, JS::Callable::List> events;
 
@@ -15,6 +14,10 @@ using namespace Jerryscript;
 
 /**
  * @brief Function to register event listeners
+ *
+ * This example considers handling notifications from one or more temperature sensors,
+ * identified by the "origin" property.
+ *
  * @code {.javascript}
  * 
  * event = {
@@ -23,13 +26,13 @@ using namespace Jerryscript;
  *    },
  *    "origin" => "The\Creator\Of\The\Event" 
  * };
- * 
+ *
  * addEventListener("TEMP_CHANGE", function(event) {
  *      console.log("Got Event" + event.name);
  * });
- * 
+ *
  * @endcode
- * 
+ *
  */
 Value addEventListener(const CallInfo& callInfo, Value& eventName, Callable& function)
 {
@@ -79,19 +82,23 @@ bool triggerEvent(const String& name, const JS::Object& params)
 
 void startJsvm()
 {
+	JS::initialise();
+
+	auto realm = JS::global();
+
 	/*
 	 * This is how we register a new function in JavaScript
 	 * that will communicate directly with our C/C++ code.
 	 */
-	vm.registerFunction("addEventListener", addEventListener);
+	realm.registerFunction("addEventListener", addEventListener);
 
-	if(!vm.load(main_snap)) {
+	if(!JS::Snapshot::load(main_snap)) {
 		debug_e("Failed to load snapshot");
 		return;
 	}
 
 	// Now you can initialize your script by calling the init() JavaScript function
-	if(!vm.runFunction("init")) {
+	if(realm.runFunction("init").isError()) {
 		debug_e("Failed executing the init function.");
 	}
 
@@ -100,8 +107,9 @@ void startJsvm()
 	 */
 	timer.initializeMs<2000>([]() {
 		JS::Object params;
-		params["temp"] = 20;
-		triggerEvent("EVENT_TEMP", params);
+		params["temp"] = int(random(25, 100));
+		params["origin"] = F("cpu/temp");
+		triggerEvent(F("EVENT_TEMP"), params);
 	});
 	timer.start();
 }

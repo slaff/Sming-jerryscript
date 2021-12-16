@@ -14,22 +14,23 @@
 
 namespace Jerryscript
 {
-VirtualMachine::VirtualMachine(jerry_init_flag_t flags /* =JERRY_INIT_EMPTY */)
+void initialise(jerry_init_flag_t flags)
 {
 	jerry_init(flags);
 
-	registerFunction("print", printFunction);
+	auto realm = global();
+	realm.registerFunction("print", printFunction);
 #ifdef DEBUG
-	registerFunction("alert", alertFunction);
+	realm.registerFunction("alert", alertFunction);
 #endif
 }
 
-VirtualMachine::~VirtualMachine()
+void cleanup()
 {
 	jerry_cleanup();
 }
 
-bool VirtualMachine::eval(const String& jsCode)
+bool eval(const String& jsCode)
 {
 	Value res = OwnedValue{jerry_eval(reinterpret_cast<const jerry_char_t*>(jsCode.c_str()), jsCode.length(), false)};
 	if(res.isError()) {
@@ -40,7 +41,9 @@ bool VirtualMachine::eval(const String& jsCode)
 	return true;
 }
 
-bool VirtualMachine::load(const uint32_t* snapshot, size_t size)
+namespace Snapshot
+{
+bool load(const uint32_t* snapshot, size_t size)
 {
 	Value res = OwnedValue{jerry_exec_snapshot(snapshot, size, 0, JERRY_SNAPSHOT_EXEC_COPY_DATA, nullptr)};
 	if(res.isError()) {
@@ -51,27 +54,6 @@ bool VirtualMachine::load(const uint32_t* snapshot, size_t size)
 	return true;
 }
 
-bool VirtualMachine::runFunction(const String& functionName)
-{
-	auto realm = global();
-	Callable func = realm.getProperty(functionName);
-	if(func.isError()) {
-		debug_e("[JS] %s error: '%s' not found", String(Error(func)).c_str(), functionName.c_str());
-		return false;
-	}
-
-	if(!func.isCallable()) {
-		debug_e("[JS] error '%s': not a function", functionName.c_str());
-		return false;
-	}
-
-	auto res = func.call(realm);
-	if(res.isError()) {
-		debug_e("[JS] %s error calling '%s'", String(Error(res)).c_str(), functionName.c_str());
-		return false;
-	}
-
-	return true;
-}
+} // namespace Snapshot
 
 } // namespace Jerryscript

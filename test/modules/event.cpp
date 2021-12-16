@@ -33,18 +33,20 @@ public:
 
 	void execute() override
 	{
-		vm.reset(new JS::VirtualMachine);
+		JS::initialise();
+
+		auto realm = JS::global();
 
 		TEST_CASE("Start VM")
 		{
-			REQUIRE(vm->load(eventSnap));
-			REQUIRE(vm->registerFunction("addEventListener", addEventListener));
-			REQUIRE(vm->runFunction("init"));
+			REQUIRE(JS::Snapshot::load(eventSnap));
+			REQUIRE(realm.registerFunction(F("addEventListener"), addEventListener));
+			REQUIRE(!realm.runFunction("init").isError());
 		}
 
 		TEST_CASE("Create error")
 		{
-			JS::Error error(JS::ErrorType::Range, "Bad range");
+			JS::Error error(JS::ErrorType::Range, F("Bad range"));
 			Serial.println(error.message());
 			printValue("error", error);
 		}
@@ -61,19 +63,18 @@ public:
 			event["name"] = testEventName;
 			event["params"] = params;
 
-			auto realm = JS::global();
 			JS::Object arg2;
 			JS::Value res;
 			JS::Value prop;
 
 			res = listeners[0].call(realm, event);
-			printValue("listeners[0].call", res);
+			printValue(F("listeners[0].call"), res);
 			REQUIRE_EQ(res.type(), JS::Type::String);
 			REQUIRE_EQ(res.as<String>(), "one");
 
 			arg2["value"] = true;
 			res = listeners[1].call(realm, {event, arg2});
-			printValue("listeners[1].call", res);
+			printValue(F("listeners[1].call"), res);
 			REQUIRE_EQ(res.type(), JS::Type::Number);
 			REQUIRE_EQ(res.as<unsigned>(), 2);
 			prop = arg2["value"];
@@ -82,7 +83,7 @@ public:
 
 			arg2["value"] = 12.5;
 			res = listeners[2].call(realm, {event, arg2});
-			printValue("listeners[2].call", res);
+			printValue(F("listeners[2].call"), res);
 			REQUIRE_EQ(res.type(), JS::Type::Number);
 			REQUIRE_EQ(res.as<float>(), 3.5);
 			prop = arg2.getProperty("value");
@@ -94,15 +95,13 @@ public:
 
 		TEST_CASE("Shutdown VM")
 		{
+			realm.reset();
 			events.clear();
-			vm.reset();
+			JS::cleanup();
 
 			REQUIRE_EQ(JS::getHeapUsed(), 0);
 		}
 	}
-
-private:
-	std::unique_ptr<JS::VirtualMachine> vm;
 };
 
 } // namespace

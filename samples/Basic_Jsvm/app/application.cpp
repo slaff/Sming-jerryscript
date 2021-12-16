@@ -3,20 +3,21 @@
 
 namespace
 {
-JS::VirtualMachine vm;
-JS::Task task(vm);
+JS::Task task;
 
 IMPORT_FSTR(main_snap, PROJECT_DIR "/out/jerryscript/main.js.snap")
 
 void startJsvm()
 {
-	if(!vm.load(main_snap)) {
+	JS::initialise();
+
+	if(!JS::Snapshot::load(main_snap)) {
 		debug_e("Failed to load snapshot");
 		return;
 	}
 
 	// Now you can initialize your script by calling a setup() JavaScript function
-	if(!vm.runFunction("setup")) {
+	if(JS::global().runFunction("setup").isError()) {
 		debug_e("Failed executing the setup function.");
 	}
 

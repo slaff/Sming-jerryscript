@@ -33,7 +33,8 @@ endif
 APP_CFLAGS += -DRESTART_DELAY=$(RESTART_DELAY)
 
 define BuildAndRun
-$(MAKE) snap-clean && MODULE="$1.$3" $(MAKE) JERRY_COMPACT_PROFILE=$2 SMING_RELEASE=$4 run
++$(MAKE) snap-clean
++$(MAKE) MODULE="$(patsubst %/test,%/,$(MODULE))$1.$3" JERRY_COMPACT_PROFILE=$2 SMING_RELEASE=$4 run
 endef
 
 .PHONY: execute

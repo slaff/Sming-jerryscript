@@ -30,28 +30,26 @@ void cleanup()
 	jerry_cleanup();
 }
 
-bool eval(const String& jsCode)
+Value eval(const String& jsCode)
 {
 	Value res = OwnedValue{jerry_eval(reinterpret_cast<const jerry_char_t*>(jsCode.c_str()), jsCode.length(), false)};
 	if(res.isError()) {
 		debug_e("[JS] eval failed: %s", String(Error(res)).c_str());
-		return false;
 	}
 
-	return true;
+	return res;
 }
 
 namespace Snapshot
 {
-bool load(const uint32_t* snapshot, size_t size)
+Value load(const uint32_t* snapshot, size_t size)
 {
 	Value res = OwnedValue{jerry_exec_snapshot(snapshot, size, 0, JERRY_SNAPSHOT_EXEC_COPY_DATA, nullptr)};
 	if(res.isError()) {
 		debug_e("[JS] execute snapshot failed: %s", String(Error(res)).c_str());
-		return false;
 	}
 
-	return true;
+	return res;
 }
 
 } // namespace Snapshot

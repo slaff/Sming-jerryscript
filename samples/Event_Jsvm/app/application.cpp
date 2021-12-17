@@ -92,7 +92,7 @@ void startJsvm()
 	 */
 	realm.registerFunction("addEventListener", addEventListener);
 
-	if(!JS::Snapshot::load(main_snap)) {
+	if(JS::Snapshot::load(main_snap).isError()) {
 		debug_e("Failed to load snapshot");
 		return;
 	}

@@ -39,7 +39,7 @@ public:
 
 		TEST_CASE("Start VM")
 		{
-			REQUIRE(JS::Snapshot::load(eventSnap));
+			REQUIRE(!JS::Snapshot::load(eventSnap).isError());
 			REQUIRE(realm.registerFunction(F("addEventListener"), addEventListener));
 			REQUIRE(!realm.runFunction("init").isError());
 		}

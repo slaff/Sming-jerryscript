@@ -46,6 +46,14 @@ Configuration variables
    Enable jerryscript heap memory tracking.
 
 
+.. envvar:: JERRY_ERROR_MESSAGES
+
+   default: 0 (disabled)
+
+   Enable text messages for common errors.
+   Consumes ~2K RAM on ESP8266.
+
+
 .. envvar:: JERRY_COMPACT_PROFILE
 
    default: 1 (enabled)

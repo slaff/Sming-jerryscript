@@ -19,4 +19,10 @@ menu "JerryScript"
         bool "Enable jerryscript heap memory tracking"
         default Y
 
+    config JERRY_ERROR_MESSAGES
+        bool "Enable text messages for common errors"
+        default N
+        help
+            Consumes ~2K RAM on ESP8266
+
 endmenu

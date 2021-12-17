@@ -76,6 +76,7 @@ $(JERRY_SNAPSHOT_TOOL):
 		--lto OFF \
 		--jerry-cmdline-snapshot ON \
 		--builddir "$(JERRY_BUILD_DIR)" \
+		--error-messages ON \
 		$(JERRY_CMAKE_PARAMS) \
 		$(patsubst %,--compile-flag "-D %",$(JERRY_COMPILER_FLAGS))
 

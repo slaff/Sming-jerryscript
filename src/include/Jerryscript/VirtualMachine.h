@@ -29,6 +29,16 @@ void initialise(jerry_init_flag_t flags = JERRY_INIT_EMPTY);
  */
 void cleanup();
 
+/**
+ * @brief Check if optional feature is available
+ * @param feature
+ * @retval bool true if library has been compiled with requested feature
+ */
+inline bool isFeatureEnabled(Feature feature)
+{
+	return jerry_is_feature_enabled(jerry_feature_t(feature));
+}
+
 /*
  * @brief Parses the JavaScript code and prepares it for execution
  * @retval bool true on success

@@ -140,6 +140,7 @@ $(JERRY_TYPES_H):
 	$(call JerryGetTypes,JERRY_ERROR_,types,JERRY_ERROR_TYPE)
 	$(call JerryGetTypes,JERRY_OBJECT_TYPE_,types)
 	$(call JerryGetTypes,JERRY_FUNCTION_TYPE_,types)
+	$(call JerryGetTypes,JERRY_FEATURE_,types)
 
 jerryscript-clean: jerry-clean-types
 

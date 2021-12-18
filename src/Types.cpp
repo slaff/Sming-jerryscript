@@ -65,6 +65,19 @@ String toString(Jerryscript::FunctionType functionType)
 	}
 }
 
+String toString(Jerryscript::Feature feature)
+{
+	switch(feature) {
+#define XX(jt, t)                                                                                                      \
+	case Jerryscript::Feature::t:                                                                                      \
+		return F(#t);
+		JERRY_FEATURE_MAP(XX)
+#undef XX
+	default:
+		return nullptr;
+	}
+}
+
 namespace Jerryscript
 {
 size_t Value::readString(unsigned offset, char* buffer, size_t length) const

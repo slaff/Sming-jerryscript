@@ -47,6 +47,12 @@ enum class FunctionType {
 #undef XX
 };
 
+enum class Feature {
+#define XX(jt, t) t = jt,
+	JERRY_FEATURE_MAP(XX)
+#undef XX
+};
+
 /**
  * @brief Use to initialise Value object by taking ownership of native/raw jerryscript value
  *

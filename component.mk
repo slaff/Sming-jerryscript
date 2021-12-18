@@ -108,7 +108,7 @@ $(APP_JS_SNAP_FILES): $(JERRY_SNAPSHOT_TOOL) $(addprefix $(APP_JS_SOURCE_DIR)/,$
 	$(Q) $(APP_JS_SNAP_UPDATED)
 
 $(APP_JS_SNAP_DIR):
-	mkdir -p $@
+	$(Q) mkdir -p $@
 
 clean: snap-clean
 snap-clean:

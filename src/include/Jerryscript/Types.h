@@ -182,6 +182,7 @@ public:
 	 */
 	Value(Value&& value)
 	{
+		reset();
 		std::swap(this->value, value.value);
 	}
 
@@ -260,8 +261,10 @@ public:
 	 */
 	Value& operator=(Value&& value)
 	{
-		reset();
-		std::swap(this->value, value.value);
+		if(this != &value) {
+			reset();
+			std::swap(this->value, value.value);
+		}
 		return *this;
 	}
 
@@ -270,10 +273,10 @@ public:
 	 */
 	Value& reset(jerry_value_t value = ECMA_VALUE_EMPTY)
 	{
-		if(value != this->value) {
+		if(this->value != ECMA_VALUE_EMPTY) {
 			jerry_release_value(this->value);
-			this->value = value;
 		}
+		this->value = value;
 		return *this;
 	}
 

@@ -28,3 +28,9 @@ function init() {
 
 	addEventListener("EVENT_TEMP", thirdListener);
 }
+
+function onload() {
+	return "OK, module loaded!";
+}
+
+onload();

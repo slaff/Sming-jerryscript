@@ -39,8 +39,10 @@ public:
 
 		TEST_CASE("Start VM")
 		{
-			REQUIRE(!JS::Snapshot::load(eventSnap).isError());
-			REQUIRE(realm.registerFunction(F("addEventListener"), addEventListener));
+			DEFINE_FSTR_LOCAL(FS_moduleLoaded, "OK, module loaded!");
+			DEFINE_FSTR_LOCAL(FS_addEventListener, "addEventListener");
+			REQUIRE(FS_moduleLoaded == JS::Snapshot::load(eventSnap));
+			REQUIRE(realm.registerFunction(FS_addEventListener, addEventListener));
 			REQUIRE(!realm.runFunction("init").isError());
 		}
 

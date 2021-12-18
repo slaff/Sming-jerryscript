@@ -1,4 +1,4 @@
-# JerryScript 
+# JerryScript
 COMPONENT_SUBMODULES := jerryscript
 
 JERRYSCRIPT_ROOT := $(COMPONENT_PATH)/jerryscript
@@ -114,3 +114,35 @@ clean: snap-clean
 snap-clean:
 	$(Q) rm -rf $(APP_JS_SNAP_DIR)
 endif
+
+# We want maps for some jerryscript types to allow strong type aliases and printability
+# Generate these by parsing jerryscript headers
+
+JERRY_TYPES_H := $(COMPONENT_PATH)/src/include/Jerryscript/.typemaps.h
+
+# Generate MAP #define for a jerryscript C enumeration
+# $1 -> e.g. JERRY_FUNCTION_TYPE_
+# $2 -> source file
+# $3 -> optional name for map
+define JerryGetTypes
+$(Q) printf "#define $(if $3,$3_,$1)MAP(XX)" >> $@
+$(Q) $(foreach v,\
+$(shell $(AWK) -F " |,|=" '/$1/ { sub(/^ +$1/,""); print $$1 }' $(JERRYSCRIPT_ROOT)/jerry-core/include/jerryscript-$2.h),\
+printf " \\\\\n\tXX($1$v, %s)" $$( echo "$v" | sed -E 's/(.*)/\L\1/; s/(^|_)([a-z0-9])/\U\2/g' ) >> $@; )
+$(Q) printf "\n\n" >> $@
+endef
+
+COMPONENT_PREREQUISITES += $(JERRY_TYPES_H)
+
+$(JERRY_TYPES_H):
+	$(Q) printf "//\n// Automatically generated: DO NOT EDIT\n//\n\n" > $@
+	$(call JerryGetTypes,JERRY_TYPE_,types,JERRY_VALUE_TYPE)
+	$(call JerryGetTypes,JERRY_ERROR_,types,JERRY_ERROR_TYPE)
+	$(call JerryGetTypes,JERRY_OBJECT_TYPE_,types)
+	$(call JerryGetTypes,JERRY_FUNCTION_TYPE_,types)
+
+jerryscript-clean: jerry-clean-types
+
+.PHONY: jerry-clean-types
+jerry-clean-types:
+	$(Q) rm -f $(JERRY_TYPES_H)

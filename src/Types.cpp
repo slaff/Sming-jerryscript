@@ -29,9 +29,9 @@ String toString(Jerryscript::Type type)
 String toString(Jerryscript::ErrorType errorType)
 {
 	switch(errorType) {
-#define XX(jet, et)                                                                                                    \
-	case Jerryscript::ErrorType::et:                                                                                   \
-		return F(#et);
+#define XX(jt, t)                                                                                                      \
+	case Jerryscript::ErrorType::t:                                                                                    \
+		return F(#t);
 		JERRY_ERROR_TYPE_MAP(XX)
 #undef XX
 	default:
@@ -42,9 +42,9 @@ String toString(Jerryscript::ErrorType errorType)
 String toString(Jerryscript::ObjectType objectType)
 {
 	switch(objectType) {
-#define XX(jot, ot)                                                                                                    \
-	case Jerryscript::ObjectType::ot:                                                                                  \
-		return F(#ot);
+#define XX(jt, t)                                                                                                      \
+	case Jerryscript::ObjectType::t:                                                                                   \
+		return F(#t);
 		JERRY_OBJECT_TYPE_MAP(XX)
 #undef XX
 	default:
@@ -55,9 +55,9 @@ String toString(Jerryscript::ObjectType objectType)
 String toString(Jerryscript::FunctionType functionType)
 {
 	switch(functionType) {
-#define XX(jft, ft)                                                                                                    \
-	case Jerryscript::FunctionType::ft:                                                                                \
-		return F(#ft);
+#define XX(jt, t)                                                                                                      \
+	case Jerryscript::FunctionType::t:                                                                                 \
+		return F(#t);
 		JERRY_FUNCTION_TYPE_MAP(XX)
 #undef XX
 	default:

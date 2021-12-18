@@ -13,6 +13,7 @@
 #pragma once
 
 #include <include/jerryscript.h>
+#include ".typemaps.h"
 #include <WString.h>
 #include <WVector.h>
 
@@ -22,86 +23,26 @@ extern "C" {
 
 namespace Jerryscript
 {
-#define JERRY_VALUE_TYPE_MAP(XX)                                                                                       \
-	XX(JERRY_TYPE_NONE, None)                                                                                          \
-	XX(JERRY_TYPE_UNDEFINED, Undefined)                                                                                \
-	XX(JERRY_TYPE_NULL, Null)                                                                                          \
-	XX(JERRY_TYPE_BOOLEAN, Boolean)                                                                                    \
-	XX(JERRY_TYPE_NUMBER, Number)                                                                                      \
-	XX(JERRY_TYPE_STRING, String)                                                                                      \
-	XX(JERRY_TYPE_OBJECT, Object)                                                                                      \
-	XX(JERRY_TYPE_FUNCTION, Function)                                                                                  \
-	XX(JERRY_TYPE_ERROR, Error)                                                                                        \
-	XX(JERRY_TYPE_SYMBOL, Symbol)                                                                                      \
-	XX(JERRY_TYPE_BIGINT, BigInt)
-
 enum class Type {
 #define XX(jt, t) t = jt,
 	JERRY_VALUE_TYPE_MAP(XX)
 #undef XX
 };
 
-#define JERRY_ERROR_TYPE_MAP(XX)                                                                                       \
-	XX(JERRY_ERROR_NONE, None)                                                                                         \
-	XX(JERRY_ERROR_COMMON, Common)                                                                                     \
-	XX(JERRY_ERROR_EVAL, Eval)                                                                                         \
-	XX(JERRY_ERROR_RANGE, Range)                                                                                       \
-	XX(JERRY_ERROR_REFERENCE, Reference)                                                                               \
-	XX(JERRY_ERROR_SYNTAX, Syntax)                                                                                     \
-	XX(JERRY_ERROR_TYPE, Type)                                                                                         \
-	XX(JERRY_ERROR_URI, URI)                                                                                           \
-	XX(JERRY_ERROR_AGGREGATE, Aggregate)
-
 enum class ErrorType {
-#define XX(je, e) e = je,
+#define XX(jt, t) t = jt,
 	JERRY_ERROR_TYPE_MAP(XX)
 #undef XX
 };
 
-#define JERRY_OBJECT_TYPE_MAP(XX)                                                                                      \
-	XX(JERRY_OBJECT_TYPE_NONE, None)                                                                                   \
-	XX(JERRY_OBJECT_TYPE_GENERIC, Generic)                                                                             \
-	XX(JERRY_OBJECT_TYPE_MODULE_NAMESPACE, ModuleNamespace)                                                            \
-	XX(JERRY_OBJECT_TYPE_ARRAY, Array)                                                                                 \
-	XX(JERRY_OBJECT_TYPE_PROXY, Proxy)                                                                                 \
-	XX(JERRY_OBJECT_TYPE_SCRIPT, Script)                                                                               \
-	XX(JERRY_OBJECT_TYPE_MODULE, Module)                                                                               \
-	XX(JERRY_OBJECT_TYPE_PROMISE, Promise)                                                                             \
-	XX(JERRY_OBJECT_TYPE_DATAVIEW, Dataview)                                                                           \
-	XX(JERRY_OBJECT_TYPE_FUNCTION, Function)                                                                           \
-	XX(JERRY_OBJECT_TYPE_TYPEDARRAY, TypedArray)                                                                       \
-	XX(JERRY_OBJECT_TYPE_ITERATOR, Iterator)                                                                           \
-	XX(JERRY_OBJECT_TYPE_CONTAINER, Container)                                                                         \
-	XX(JERRY_OBJECT_TYPE_ERROR, Error)                                                                                 \
-	XX(JERRY_OBJECT_TYPE_ARRAYBUFFER, ArrayBuffer)                                                                     \
-	XX(JERRY_OBJECT_TYPE_SHARED_ARRAY_BUFFER, SharedArrayBuffer)                                                       \
-	XX(JERRY_OBJECT_TYPE_ARGUMENTS, Arguments)                                                                         \
-	XX(JERRY_OBJECT_TYPE_BOOLEAN, Boolean)                                                                             \
-	XX(JERRY_OBJECT_TYPE_DATE, Date)                                                                                   \
-	XX(JERRY_OBJECT_TYPE_NUMBER, Number)                                                                               \
-	XX(JERRY_OBJECT_TYPE_REGEXP, Regexp)                                                                               \
-	XX(JERRY_OBJECT_TYPE_STRING, String)                                                                               \
-	XX(JERRY_OBJECT_TYPE_SYMBOL, Symbol)                                                                               \
-	XX(JERRY_OBJECT_TYPE_GENERATOR, Generator)                                                                         \
-	XX(JERRY_OBJECT_TYPE_BIGINT, BigInt)                                                                               \
-	XX(JERRY_OBJECT_TYPE_WEAKREF, WeakRef)
-
 enum class ObjectType {
-#define XX(jot, ot) ot = jot,
+#define XX(jt, t) t = jt,
 	JERRY_OBJECT_TYPE_MAP(XX)
 #undef XX
 };
 
-#define JERRY_FUNCTION_TYPE_MAP(XX)                                                                                    \
-	XX(JERRY_FUNCTION_TYPE_NONE, None)                                                                                 \
-	XX(JERRY_FUNCTION_TYPE_GENERIC, Generic)                                                                           \
-	XX(JERRY_FUNCTION_TYPE_ACCESSOR, Accessor)                                                                         \
-	XX(JERRY_FUNCTION_TYPE_BOUND, Bound)                                                                               \
-	XX(JERRY_FUNCTION_TYPE_ARROW, Arrow)                                                                               \
-	XX(JERRY_FUNCTION_TYPE_GENERATOR, Generator)
-
 enum class FunctionType {
-#define XX(jft, ft) ft = jft,
+#define XX(jt, t) t = jt,
 	JERRY_FUNCTION_TYPE_MAP(XX)
 #undef XX
 };

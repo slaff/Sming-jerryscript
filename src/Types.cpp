@@ -127,17 +127,21 @@ Array Object::keys() const
 Callable Object::getFunction(const String& name)
 {
 	Callable func = getProperty(name);
-	if(func.isError()) {
-		debug_e("[JS] %s error: '%s' not found", String(Error(func)).c_str(), name.c_str());
+	if(func.isCallable()) {
 		return func;
 	}
 
-	if(!func.isCallable()) {
-		debug_e("[JS] error '%s': not a function", name.c_str());
-		return Error(ErrorType::Type, F("Not Callable"));
+	Error err;
+	if(!func.isDefined()) {
+		err = Error(ErrorType::Reference, F("Not found"));
+	} else if(!func.isError()) {
+		err = Error(ErrorType::Type, F("Not Callable"));
+	} else {
+		err = func;
 	}
 
-	return func;
+	debug_e("%s", String(err).c_str());
+	return err;
 }
 
 static void dbgCheckCall(const String& name, const Value& res)
@@ -184,6 +188,7 @@ Value Error::message() const
 Error::operator String() const
 {
 	String s = ::toString(errorType());
+	s += F(" error");
 	String msg = message();
 	if(msg.length() != 0) {
 		s += ": ";

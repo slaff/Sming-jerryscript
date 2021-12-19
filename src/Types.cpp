@@ -99,7 +99,7 @@ String Value::subString(unsigned offset, size_t length) const
 
 Value::operator String() const
 {
-	if(isError()) {
+	if(isError() || isEmpty()) {
 		return nullptr;
 	}
 

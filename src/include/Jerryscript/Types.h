@@ -348,7 +348,7 @@ public:
 	 */
 	bool isEmpty() const
 	{
-		return value != ECMA_VALUE_EMPTY;
+		return value == ECMA_VALUE_EMPTY;
 	}
 
 	/**

@@ -64,6 +64,14 @@ Configuration variables
    Set to 0 to use es.next profile.
 
 
+.. envvar:: JERRY_PARSER
+
+   default: 0 (disabled)
+
+   Enable to build library with javascript parser enabled.
+   Required for use of :cpp:func:`Jerryscript::eval` function.
+
+
 .. envvar:: JERRY_GLOBAL_HEAP_SIZE
 
    default: 1 (in KB)

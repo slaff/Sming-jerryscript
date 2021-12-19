@@ -25,4 +25,10 @@ menu "JerryScript"
         help
             Consumes ~2K RAM on ESP8266
 
+    config JERRY_PARSER
+        bool "Build library with javascript parser enabled"
+        default N
+        help
+            Required for use of :cpp:func:`Jerryscript::eval` function.
+
 endmenu

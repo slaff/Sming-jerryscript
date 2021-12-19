@@ -205,6 +205,10 @@ Value Error::message() const
 
 Error::operator String() const
 {
+	if(!isError()) {
+		return nullptr;
+	}
+
 	String s = ::toString(errorType());
 	s += F(" error");
 	String msg = message();

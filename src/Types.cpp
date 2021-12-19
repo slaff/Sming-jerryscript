@@ -13,6 +13,16 @@
 #include "include/Jerryscript/Types.h"
 #include <debug_progmem.h>
 
+extern "C" {
+#include <ecma/base/ecma-helpers.h>
+}
+
+// Check Ecma values are correct
+#define XX(name, value)                                                                                                \
+	static_assert(unsigned(Jerryscript::Ecma::name) == ECMA_##name, "Internal value '" #name "' mismatch");
+JERRY_ECMA_MAP(XX)
+#undef XX
+
 String toString(Jerryscript::Type type)
 {
 	switch(type) {
@@ -80,6 +90,14 @@ String toString(Jerryscript::Feature feature)
 
 namespace Jerryscript
 {
+Value::Value(int value) : value(ecma_make_int32_value(value))
+{
+}
+
+Value::Value(unsigned value) : value(ecma_make_uint32_value(value))
+{
+}
+
 size_t Value::readString(unsigned offset, char* buffer, size_t length) const
 {
 	return jerry_substring_to_char_buffer(value, offset, offset + length, reinterpret_cast<jerry_char_t*>(buffer),

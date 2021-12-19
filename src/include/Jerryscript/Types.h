@@ -17,10 +17,6 @@
 #include <WString.h>
 #include <WVector.h>
 
-extern "C" {
-#include <ecma/base/ecma-helpers.h>
-}
-
 namespace Jerryscript
 {
 enum class Type {
@@ -50,6 +46,23 @@ enum class FunctionType {
 enum class Feature {
 #define XX(jt, t) t = jt,
 	JERRY_FEATURE_MAP(XX)
+#undef XX
+};
+
+// ECMA values used where simple assignment or check is all that is required
+#define JERRY_ECMA_MAP(XX)                                                                                             \
+	XX(VALUE_EMPTY, 0x08)                                                                                              \
+	XX(VALUE_FALSE, 0x28)                                                                                              \
+	XX(VALUE_TRUE, 0x38)                                                                                               \
+	XX(VALUE_UNDEFINED, 0x48)                                                                                          \
+	XX(VALUE_NULL, 0x58)                                                                                               \
+	XX(VALUE_TYPE_MASK, 0x07)                                                                                          \
+	XX(TYPE_ERROR, 0x07)                                                                                               \
+	XX(TYPE_OBJECT, 0x03)
+
+enum class Ecma {
+#define XX(name, value) name = value,
+	JERRY_ECMA_MAP(XX)
 #undef XX
 };
 
@@ -88,7 +101,11 @@ struct StringValue {
  * e.g. `Value myValue = Undefined{};`
  */
 struct Undefined {
-	jerry_value_t value = ECMA_VALUE_UNDEFINED;
+	Undefined()
+	{
+	}
+
+	const jerry_value_t value = jerry_value_t(Ecma::VALUE_UNDEFINED);
 };
 
 /**
@@ -97,7 +114,11 @@ struct Undefined {
  * e.g. `Value myValue = Null{};`
  */
 struct Null {
-	jerry_value_t value = ECMA_VALUE_NULL;
+	Null()
+	{
+	}
+
+	const jerry_value_t value = jerry_value_t(Ecma::VALUE_NULL);
 };
 
 class Object;
@@ -162,11 +183,11 @@ public:
 	{
 	}
 
-	Value(const Undefined&) : value(ECMA_VALUE_UNDEFINED)
+	Value(const Undefined& value) : value(value.value)
 	{
 	}
 
-	Value(const Null&) : value(ECMA_VALUE_NULL)
+	Value(const Null& value) : value(value.value)
 	{
 	}
 
@@ -194,43 +215,38 @@ public:
 	/**
 	 * @brief Integer
 	 */
-	Value(int value) : Value(OwnedValue{ecma_make_int32_value(value)})
-	{
-	}
+	Value(int value);
 
 	/**
 	 * @brief Unsigned integer
 	 */
-	Value(unsigned value) : Value(OwnedValue{ecma_make_uint32_value(value)})
-	{
-	}
+	Value(unsigned value);
 
 	/**
 	 * @brief floating-point
 	 */
-	Value(double value) : Value(OwnedValue{jerry_create_number(value)})
+	Value(double value) : value(jerry_create_number(value))
 	{
 	}
 
 	/**
 	 * @brief Boolean
 	 */
-	Value(bool value) : Value(OwnedValue{jerry_create_boolean(value)})
+	Value(bool value) : value(jerry_create_boolean(value))
 	{
 	}
 
 	/**
 	 * @brief Wiring String
 	 */
-	Value(const String& s)
-		: Value(OwnedValue{jerry_create_string_sz(reinterpret_cast<const jerry_char_t*>(s.c_str()), s.length())})
+	Value(const String& s) : value(jerry_create_string_sz(reinterpret_cast<const jerry_char_t*>(s.c_str()), s.length()))
 	{
 	}
 
 	/**
 	 * @brief NUL-terminated 'C' string
 	 */
-	Value(const char* s) : Value(OwnedValue{jerry_create_string(reinterpret_cast<const jerry_char_t*>(s))})
+	Value(const char* s) : value(jerry_create_string(reinterpret_cast<const jerry_char_t*>(s)))
 	{
 	}
 
@@ -271,9 +287,9 @@ public:
 	/**
 	 * @brief Reset contents of object to new value (default is unassigned)
 	 */
-	Value& reset(jerry_value_t value = ECMA_VALUE_EMPTY)
+	Value& reset(jerry_value_t value = jerry_value_t(Ecma::VALUE_EMPTY))
 	{
-		if(this->value != ECMA_VALUE_EMPTY) {
+		if(!isEmpty()) {
 			jerry_release_value(this->value);
 		}
 		this->value = value;
@@ -308,7 +324,7 @@ public:
 	jerry_value_t release()
 	{
 		auto res = value;
-		value = ECMA_VALUE_EMPTY;
+		value = jerry_value_t(Ecma::VALUE_EMPTY);
 		return res;
 	}
 
@@ -339,7 +355,7 @@ public:
 	 */
 	bool isError() const
 	{
-		return jerry_value_is_error(value);
+		return ecmaType() == Ecma::TYPE_ERROR;
 	}
 
 	/**
@@ -348,7 +364,7 @@ public:
 	 */
 	bool isEmpty() const
 	{
-		return value == ECMA_VALUE_EMPTY;
+		return Ecma(value) == Ecma::VALUE_EMPTY;
 	}
 
 	/**
@@ -356,7 +372,7 @@ public:
 	 */
 	bool isDefined() const
 	{
-		return value != ECMA_VALUE_UNDEFINED;
+		return Ecma(value) != Ecma::VALUE_UNDEFINED;
 	}
 
 	/**
@@ -372,7 +388,7 @@ public:
 	 */
 	bool isFalse() const
 	{
-		return value == ECMA_VALUE_FALSE;
+		return Ecma(value) == Ecma::VALUE_FALSE;
 	}
 
 	/**
@@ -380,7 +396,7 @@ public:
 	 */
 	bool isTrue() const
 	{
-		return value == ECMA_VALUE_TRUE;
+		return Ecma(value) == Ecma::VALUE_TRUE;
 	}
 
 	/**
@@ -388,7 +404,7 @@ public:
 	 */
 	bool isNull() const
 	{
-		return value == ECMA_VALUE_NULL;
+		return Ecma(value) == Ecma::VALUE_NULL;
 	}
 
 	/**
@@ -404,7 +420,7 @@ public:
 	 */
 	bool isObject() const
 	{
-		return jerry_value_is_object(value);
+		return ecmaType() == Ecma::TYPE_OBJECT;
 	}
 
 	/**
@@ -509,7 +525,12 @@ public:
 	}
 
 private:
-	jerry_value_t value{ECMA_VALUE_EMPTY};
+	Ecma ecmaType() const
+	{
+		return Ecma(value & unsigned(Ecma::VALUE_TYPE_MASK));
+	}
+
+	jerry_value_t value{jerry_value_t(Ecma::VALUE_EMPTY)};
 };
 
 /**

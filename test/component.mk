@@ -6,7 +6,6 @@ COMPONENT_DEPENDS := \
 APP_JS_SOURCE_DIR := files
 APP_JS_SNAP_UPDATED := touch modules/*
 JERRY_GLOBAL_HEAP_SIZE := 8
-JERRY_ENABLE_DEBUG := $(if $(SMING_RELEASE),0,1)
 
 # Don't need network
 HOST_NETWORK_OPTIONS := --nonet
@@ -34,12 +33,12 @@ APP_CFLAGS += -DRESTART_DELAY=$(RESTART_DELAY)
 
 define BuildAndRun
 +$(MAKE) snap-clean
-+$(MAKE) MODULE="$(patsubst %/test,%/,$(MODULE))$1.$3" JERRY_COMPACT_PROFILE=$2 SMING_RELEASE=$4 run
++$(MAKE) MODULE="$(patsubst %/test,%/,$(MODULE))$1.$3" JERRY_COMPACT_PROFILE=$2 JERRY_ENABLE_DEBUG=$4 run
 endef
 
 .PHONY: execute
 execute:
-	$(call BuildAndRun,minimal,1,debug,0)
-	$(call BuildAndRun,minimal,1,release,1)
-	$(call BuildAndRun,es.next,0,debug,0)
-	$(call BuildAndRun,es.next,0,release,1)
+	$(call BuildAndRun,minimal,1,debug,1)
+	$(call BuildAndRun,minimal,1,release,0)
+	$(call BuildAndRun,es.next,0,debug,1)
+	$(call BuildAndRun,es.next,0,release,0)

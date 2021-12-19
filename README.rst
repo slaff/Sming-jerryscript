@@ -36,7 +36,8 @@ Configuration variables
 
    default: 0 (disabled)
 
-   Enable assertions and debug messages in jerryscript library. This adds around 80KB to the program size.
+   Enable assertions and debug messages in jerryscript library.
+   Should be left disabled unless debugging the jerryscript engine itself.
 
 
 .. envvar:: JERRY_MEM_STATS

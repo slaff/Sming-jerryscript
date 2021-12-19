@@ -13,7 +13,7 @@ menu "JerryScript"
         bool "Enable assertions and debug messages in jerryscript library"
         default N
         help
-            This adds around 80KB to the program size.
+            Should be left disabled unless debugging the jerryscript engine itself.
 
     config JERRY_MEM_STATS
         bool "Enable jerryscript heap memory tracking"

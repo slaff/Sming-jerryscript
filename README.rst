@@ -22,6 +22,25 @@ To save space and be able to run JerryScript on an embedded device Sming compile
 This means that the JavaScript files have to be compiled before landing on the device.
 See the samples below to learn more.
 
+VM integrity
+------------
+
+The Jerryscript VM may encounter situations where it cannot continue execution, such as memory allocation failure
+or invalid bytecode.
+
+Fatal errors cause engine execution to halt. It must be "re-booted" (in a virtual sense).
+This requires application co-operation as scripts may need to be re-loaded, external functions re-registered, etc.
+
+In general Jerryscript :cpp:class:`Jerryscript::Value` objects should not be held globally, but created as local
+variables as required to interact with the engine.
+Otherwise, re-initialisation becomes more difficult.
+
+Note that the VM uses own static heap (sized by :envvar:`JERRY_GLOBAL_HEAP_SIZE`) so main system heap is unaffected.
+
+When :envvar:`JERRY_ENABLE_DEBUG` is enabled it may not be possible to recover because VM objects may be left with
+invalid reference counts, for example, which will cause :cpp:func:`Jerryscript::cleanup` to fail.
+Applications should generally therefore be built with this setting disabled.
+
 Version
 -------
 

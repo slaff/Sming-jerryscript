@@ -12,6 +12,7 @@
 #include <stdarg.h>
 #include <sys/time.h>
 
+#include "include/Jerryscript/Except.h"
 #include <include/jerryscript-port.h>
 #include <include/jerryscript-core.h>
 #include <debug_progmem.h>
@@ -71,7 +72,7 @@ double jerry_port_get_local_time_zone_adjustment(double unix_ms, /**< ms since u
  */
 void jerry_port_fatal(jerry_fatal_code_t code)
 {
-	abort();
+	Jerryscript::Except::raise(code);
 } /* jerry_port_fatal */
 
 /**

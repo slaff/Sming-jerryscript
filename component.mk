@@ -145,6 +145,7 @@ $(JERRY_TYPES_H):
 	$(Q) printf "//\n// Automatically generated: DO NOT EDIT\n//\n\n" > $@
 	$(call JerryGetTypes,JERRY_TYPE_,types,JERRY_VALUE_TYPE)
 	$(call JerryGetTypes,JERRY_ERROR_,types,JERRY_ERROR_TYPE)
+	$(call JerryGetTypes,ERR_,port,JERRY_FATAL_CODE)
 	$(call JerryGetTypes,JERRY_OBJECT_TYPE_,types)
 	$(call JerryGetTypes,JERRY_FUNCTION_TYPE_,types)
 	$(call JerryGetTypes,JERRY_FEATURE_,types)

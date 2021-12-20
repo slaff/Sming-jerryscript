@@ -3,6 +3,14 @@ var x;
 function thirdListener(event) {
 	print('Third listener is a normal function!');
 	print('-------------' + (++x) + '------------------');
+
+	// Comment-out this line to see how program behaves with memory full exception!
+	return;
+
+	var y = [1, 2, 3, 4];
+	for(var x = 0; x < 10000; ++x) {
+		y[x] = 0;
+	}
 }
 
 /**

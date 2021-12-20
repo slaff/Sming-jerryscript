@@ -31,15 +31,45 @@ or invalid bytecode.
 Fatal errors cause engine execution to halt. It must be "re-booted" (in a virtual sense).
 This requires application co-operation as scripts may need to be re-loaded, external functions re-registered, etc.
 
-In general Jerryscript :cpp:class:`Jerryscript::Value` objects should not be held globally, but created as local
-variables as required to interact with the engine.
-Otherwise, re-initialisation becomes more difficult.
+If intending to run unverified javascript it is especially important to guard all
+calls into Jerryscript using the library exception handler:
+
+.. code-block:: c++
+
+   JS_TRY()
+   {
+      // Call into jerryscript engine
+   }
+   JS_CATCH()
+   {
+      // Engine has failed
+   }
+
+JS_TRY:
+   Place code here which sets up jerryscript values, etc. then calls into Jerryscript.
+   Data is allocated on local stack or in jerryscript engine.
+
+   DO NOT perform any system heap allocation here, such as creating or modifying `String`) objects.
+   If required, instantiate those above.
+
+JS_CATCH:
+   Jerryscript ust be re-initialised before any further calls.
+
+   - De-allocate any globally held jerryscript values
+   - Call JS::cleanup()
+   - Call JS::init() and any other necessary initialisation
+
+   It is recommended to provide a single function for both
+   initial jerryscript initialisation and re-initialisation.
+
+See the ``Event_Jsvm`` sample for a demonstratation.
 
 Note that the VM uses own static heap (sized by :envvar:`JERRY_GLOBAL_HEAP_SIZE`) so main system heap is unaffected.
 
 When :envvar:`JERRY_ENABLE_DEBUG` is enabled it may not be possible to recover because VM objects may be left with
 invalid reference counts, for example, which will cause :cpp:func:`Jerryscript::cleanup` to fail.
-Applications should generally therefore be built with this setting disabled.
+Applications should generally be built with this setting disabled (the default).
+
 
 Version
 -------

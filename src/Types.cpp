@@ -13,6 +13,16 @@
 #include "include/Jerryscript/Types.h"
 #include <debug_progmem.h>
 
+extern "C" {
+#include <ecma/base/ecma-helpers.h>
+}
+
+// Check Ecma values are correct
+#define XX(name, value)                                                                                                \
+	static_assert(unsigned(Jerryscript::Ecma::name) == ECMA_##name, "Internal value '" #name "' mismatch");
+JERRY_ECMA_MAP(XX)
+#undef XX
+
 String toString(Jerryscript::Type type)
 {
 	switch(type) {
@@ -29,9 +39,9 @@ String toString(Jerryscript::Type type)
 String toString(Jerryscript::ErrorType errorType)
 {
 	switch(errorType) {
-#define XX(jet, et)                                                                                                    \
-	case Jerryscript::ErrorType::et:                                                                                   \
-		return F(#et);
+#define XX(jt, t)                                                                                                      \
+	case Jerryscript::ErrorType::t:                                                                                    \
+		return F(#t);
 		JERRY_ERROR_TYPE_MAP(XX)
 #undef XX
 	default:
@@ -42,9 +52,9 @@ String toString(Jerryscript::ErrorType errorType)
 String toString(Jerryscript::ObjectType objectType)
 {
 	switch(objectType) {
-#define XX(jot, ot)                                                                                                    \
-	case Jerryscript::ObjectType::ot:                                                                                  \
-		return F(#ot);
+#define XX(jt, t)                                                                                                      \
+	case Jerryscript::ObjectType::t:                                                                                   \
+		return F(#t);
 		JERRY_OBJECT_TYPE_MAP(XX)
 #undef XX
 	default:
@@ -55,10 +65,23 @@ String toString(Jerryscript::ObjectType objectType)
 String toString(Jerryscript::FunctionType functionType)
 {
 	switch(functionType) {
-#define XX(jft, ft)                                                                                                    \
-	case Jerryscript::FunctionType::ft:                                                                                \
-		return F(#ft);
+#define XX(jt, t)                                                                                                      \
+	case Jerryscript::FunctionType::t:                                                                                 \
+		return F(#t);
 		JERRY_FUNCTION_TYPE_MAP(XX)
+#undef XX
+	default:
+		return nullptr;
+	}
+}
+
+String toString(Jerryscript::Feature feature)
+{
+	switch(feature) {
+#define XX(jt, t)                                                                                                      \
+	case Jerryscript::Feature::t:                                                                                      \
+		return F(#t);
+		JERRY_FEATURE_MAP(XX)
 #undef XX
 	default:
 		return nullptr;
@@ -67,6 +90,14 @@ String toString(Jerryscript::FunctionType functionType)
 
 namespace Jerryscript
 {
+Value::Value(int value) : value(ecma_make_int32_value(value))
+{
+}
+
+Value::Value(unsigned value) : value(ecma_make_uint32_value(value))
+{
+}
+
 size_t Value::readString(unsigned offset, char* buffer, size_t length) const
 {
 	return jerry_substring_to_char_buffer(value, offset, offset + length, reinterpret_cast<jerry_char_t*>(buffer),
@@ -86,7 +117,7 @@ String Value::subString(unsigned offset, size_t length) const
 
 Value::operator String() const
 {
-	if(isError()) {
+	if(isError() || isEmpty()) {
 		return nullptr;
 	}
 
@@ -114,17 +145,21 @@ Array Object::keys() const
 Callable Object::getFunction(const String& name)
 {
 	Callable func = getProperty(name);
-	if(func.isError()) {
-		debug_e("[JS] %s error: '%s' not found", String(Error(func)).c_str(), name.c_str());
+	if(func.isCallable()) {
 		return func;
 	}
 
-	if(!func.isCallable()) {
-		debug_e("[JS] error '%s': not a function", name.c_str());
-		return Error(ErrorType::Type, F("Not Callable"));
+	Error err;
+	if(!func.isDefined()) {
+		err = Error(ErrorType::Reference, F("Not found"));
+	} else if(!func.isError()) {
+		err = Error(ErrorType::Type, F("Not Callable"));
+	} else {
+		err = func;
 	}
 
-	return func;
+	debug_e("%s", String(err).c_str());
+	return err;
 }
 
 static void dbgCheckCall(const String& name, const Value& res)
@@ -170,7 +205,12 @@ Value Error::message() const
 
 Error::operator String() const
 {
+	if(!isError()) {
+		return nullptr;
+	}
+
 	String s = ::toString(errorType());
+	s += F(" error");
 	String msg = message();
 	if(msg.length() != 0) {
 		s += ": ";

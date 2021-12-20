@@ -72,9 +72,9 @@ bool triggerEvent(const String& name, const JS::Object& params)
 	event["name"] = name;
 	event["params"] = params;
 
-	auto realm = JS::global();
+	auto context = JS::global();
 	for(auto& listener : events[name]) {
-		listener.call(realm, event);
+		listener.call(context, event);
 	}
 
 	return true;
@@ -84,21 +84,21 @@ void startJsvm()
 {
 	JS::initialise();
 
-	auto realm = JS::global();
+	auto context = JS::global();
 
 	/*
 	 * This is how we register a new function in JavaScript
 	 * that will communicate directly with our C/C++ code.
 	 */
-	realm.registerFunction("addEventListener", addEventListener);
+	context.registerFunction("addEventListener", addEventListener);
 
-	if(!JS::Snapshot::load(main_snap)) {
+	if(JS::Snapshot::load(main_snap).isError()) {
 		debug_e("Failed to load snapshot");
 		return;
 	}
 
 	// Now you can initialize your script by calling the init() JavaScript function
-	if(realm.runFunction("init").isError()) {
+	if(context.runFunction("init").isError()) {
 		debug_e("Failed executing the init function.");
 	}
 

@@ -24,6 +24,19 @@ public:
 		JS::gc();
 		auto initialHeapUsed = JS::getHeapUsed();
 
+		TEST_CASE("Strings")
+		{
+			REQUIRE(!String(JS::Value()));
+			REQUIRE(!String(JS::Error()));
+			REQUIRE(String(JS::Value("")));
+			REQUIRE_EQ(String("undefined"), JS::Value(JS::Undefined{}));
+			REQUIRE_EQ(String("null"), JS::Value(JS::Null{}));
+			REQUIRE_EQ(String("3.141592653589793"), JS::Value(3.141592653589793));
+			REQUIRE_EQ(String("-123456789"), JS::Value(-123456789));
+			REQUIRE_EQ(String("123456789"), JS::Value(123456789));
+			REQUIRE_EQ(String("true"), JS::Value(true));
+		}
+
 		TEST_CASE("Object properties")
 		{
 			String key1 = "temp";

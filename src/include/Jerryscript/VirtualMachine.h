@@ -29,11 +29,23 @@ void initialise(jerry_init_flag_t flags = JERRY_INIT_EMPTY);
  */
 void cleanup();
 
+/**
+ * @brief Check if optional feature is available
+ * @param feature
+ * @retval bool true if library has been compiled with requested feature
+ */
+inline bool isFeatureEnabled(Feature feature)
+{
+	return jerry_is_feature_enabled(jerry_feature_t(feature));
+}
+
 /*
  * @brief Parses the JavaScript code and prepares it for execution
  * @retval bool true on success
+ * 
+ * Requires jerryscript to be compiled with parsing enabled.
  */
-bool eval(const String& jsCode);
+Value eval(const String& jsCode);
 
 /**
  * @brief Snapshot management functions
@@ -41,19 +53,21 @@ bool eval(const String& jsCode);
 namespace Snapshot
 {
 /**
- * @name Load a snapshot into the virtual machine
+ * @name Load a snapshot into the virtual machine and execute it
  * @brief Load from memory buffer
  * @param snapshot Points to snapshot content
  * @param snapshotSize Number of bytes in snapshot
- * @retval bool true on success
+ * @retval Value Result from execution, or Error
  * @{
  */
-bool load(const uint32_t* snapshot, size_t snapshotSize);
+Value load(const uint32_t* snapshot, size_t snapshotSize);
 
 /**
- * @brief Load from String
+ * @brief Load snapshot from String and execute it
+ * @param snapshot Snapshot content
+ * @retval Value Result from execution, or Error
  */
-inline bool load(const String& snapshot)
+inline Value load(const String& snapshot)
 {
 	return load(reinterpret_cast<const uint32_t*>(snapshot.c_str()), snapshot.length());
 }
@@ -61,9 +75,9 @@ inline bool load(const String& snapshot)
 /**
  * @brief Load a snapshot from file and execute it
  * @param fileName Path to snapshot file
- * @retval bool true on success
+ * @retval Value Result from execution, or Error
  */
-inline bool loadFromFile(const String& fileName)
+inline Value loadFromFile(const String& fileName)
 {
 	return load(fileGetContent(fileName));
 }

@@ -2,3 +2,5 @@ out/
 .submodule
 
 build/
+
+.typemaps.h

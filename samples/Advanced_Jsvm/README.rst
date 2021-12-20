@@ -3,31 +3,33 @@ Advanced_Jsvm
 
 .. highligh:: bash
 
-.. image:: https://github.com/jerryscript-project/jerryscript/raw/master/docs/img/engines_high_level_design.png
+To save space and be able to run JerryScript on an embedded device, this library builds without parser support.
 
-The diagram above shows the interactions between the major components of JerryScript: Parser and Virtual Machine (VM). 
-Parser performs translation of input ECMAScript application into the byte-code. 
-Prepared bytecode is executed by the Virtual Machine that performs interpretation.
-Source:  `Official JerryScript site <https://github.com/jerryscript-project/jerryscript/blob/master/docs/04.INTERNALS.md>`_. 
+This means that the JavaScript files have to be compiled into 'snap' files before landing on the device.
 
-To save space and be able to run JerryScript on an embedded device Sming compiles this library without a parser.
-This means that the JavaScript files have to be compiled before landing on the device.
-This can be done either with or without a physical access to the device.
+This can be done during normal compilation and flashing, or indirectly via web application.
 
-With Physical Access
---------------------
+Manual compilation method
+-------------------------
+
 You should have your device connected physically to your computer via USB cable. 
+
 In this case the compilation will be done on your computer and the compiled files will be saved to your device.
+
 In order to configure the JavaScript file compilation one can use :envvar:`APP_JS_SOURCE_DIR` and :envvar:`APP_JS_SOURCE_DIR` variables.
+
 All ``.js`` files in the ``APP_JS_SOURCE_DIR`` directory will be compiled into ``.snap`` files and written to ``APP_JS_SNAPDIR`` directory.
 Example::
-	
+
 	make APP_JS_SOURCE_DIR=files/js APP_JS_SNAP_DIR=out/web
 
 In this advanced sample the variables are directly stored in ``component.mk`` file.
 
-Web Browser compilation
------------------------
+The generated .snap files may be flashed or uploaded to your device for execution via any appropriate mechanism.
+
+Web Browser compilation method
+------------------------------
+
 Quite often we don't have physical access to our devices. And here comes the true beauty of this sample.
 With only network access to the device and a modern browser one can still compile JavaScript files 
 and upload them to the device. No external tools are required. 

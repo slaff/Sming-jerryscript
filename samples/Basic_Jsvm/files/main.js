@@ -6,6 +6,9 @@ var x;
 function setup() {
 	x = 0;
 	print ('Setup: X='+x);
+
+	// If return is not provided, result will be 'undefined'
+	// return true;
 }
 
 /**
@@ -15,3 +18,8 @@ function loop() {
 	x++;
 	print('Loop: X='+x);
 }
+
+/**
+ * You can call setup() directly after loading, if you prefer.
+ */
+// setup();

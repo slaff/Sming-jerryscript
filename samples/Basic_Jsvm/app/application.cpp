@@ -11,7 +11,7 @@ void startJsvm()
 {
 	JS::initialise();
 
-	if(!JS::Snapshot::load(main_snap)) {
+	if(JS::Snapshot::load(main_snap).isError()) {
 		debug_e("Failed to load snapshot");
 		return;
 	}

@@ -20,7 +20,7 @@ void startJsvm()
 	JS::initialise();
 
 	// Load the snapshot file
-	if(!JS::Snapshot::loadFromFile(MAIN_JS_FILE)) {
+	if(JS::Snapshot::loadFromFile(MAIN_JS_FILE).isError()) {
 		debug_e("Failed executing the following script: %s", String(MAIN_JS_FILE).c_str());
 		return;
 	}

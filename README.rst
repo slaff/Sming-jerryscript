@@ -36,7 +36,8 @@ Configuration variables
 
    default: 0 (disabled)
 
-   Enable assertions and debug messages in jerryscript library. This adds around 80KB to the program size.
+   Enable assertions and debug messages in jerryscript library.
+   Should be left disabled unless debugging the jerryscript engine itself.
 
 
 .. envvar:: JERRY_MEM_STATS
@@ -46,6 +47,14 @@ Configuration variables
    Enable jerryscript heap memory tracking.
 
 
+.. envvar:: JERRY_ERROR_MESSAGES
+
+   default: 0 (disabled)
+
+   Enable text messages for common errors.
+   Consumes ~2K RAM on ESP8266.
+
+
 .. envvar:: JERRY_COMPACT_PROFILE
 
    default: 1 (enabled)
@@ -53,6 +62,14 @@ Configuration variables
    Compact (minimal profile) compilation profile makes the JerryScript library smaller.
 
    Set to 0 to use es.next profile.
+
+
+.. envvar:: JERRY_PARSER
+
+   default: 0 (disabled)
+
+   Enable to build library with javascript parser enabled.
+   Required for use of :cpp:func:`Jerryscript::eval` function.
 
 
 .. envvar:: JERRY_GLOBAL_HEAP_SIZE

@@ -13,96 +13,56 @@
 #pragma once
 
 #include <include/jerryscript.h>
+#include ".typemaps.h"
 #include <WString.h>
 #include <WVector.h>
 
-extern "C" {
-#include <ecma/base/ecma-helpers.h>
-}
-
 namespace Jerryscript
 {
-#define JERRY_VALUE_TYPE_MAP(XX)                                                                                       \
-	XX(JERRY_TYPE_NONE, None)                                                                                          \
-	XX(JERRY_TYPE_UNDEFINED, Undefined)                                                                                \
-	XX(JERRY_TYPE_NULL, Null)                                                                                          \
-	XX(JERRY_TYPE_BOOLEAN, Boolean)                                                                                    \
-	XX(JERRY_TYPE_NUMBER, Number)                                                                                      \
-	XX(JERRY_TYPE_STRING, String)                                                                                      \
-	XX(JERRY_TYPE_OBJECT, Object)                                                                                      \
-	XX(JERRY_TYPE_FUNCTION, Function)                                                                                  \
-	XX(JERRY_TYPE_ERROR, Error)                                                                                        \
-	XX(JERRY_TYPE_SYMBOL, Symbol)                                                                                      \
-	XX(JERRY_TYPE_BIGINT, BigInt)
-
 enum class Type {
 #define XX(jt, t) t = jt,
 	JERRY_VALUE_TYPE_MAP(XX)
 #undef XX
 };
 
-#define JERRY_ERROR_TYPE_MAP(XX)                                                                                       \
-	XX(JERRY_ERROR_NONE, None)                                                                                         \
-	XX(JERRY_ERROR_COMMON, Common)                                                                                     \
-	XX(JERRY_ERROR_EVAL, Eval)                                                                                         \
-	XX(JERRY_ERROR_RANGE, Range)                                                                                       \
-	XX(JERRY_ERROR_REFERENCE, Reference)                                                                               \
-	XX(JERRY_ERROR_SYNTAX, Syntax)                                                                                     \
-	XX(JERRY_ERROR_TYPE, Type)                                                                                         \
-	XX(JERRY_ERROR_URI, URI)                                                                                           \
-	XX(JERRY_ERROR_AGGREGATE, Aggregate)
-
 enum class ErrorType {
-#define XX(je, e) e = je,
+#define XX(jt, t) t = jt,
 	JERRY_ERROR_TYPE_MAP(XX)
 #undef XX
 };
 
-#define JERRY_OBJECT_TYPE_MAP(XX)                                                                                      \
-	XX(JERRY_OBJECT_TYPE_NONE, None)                                                                                   \
-	XX(JERRY_OBJECT_TYPE_GENERIC, Generic)                                                                             \
-	XX(JERRY_OBJECT_TYPE_MODULE_NAMESPACE, ModuleNamespace)                                                            \
-	XX(JERRY_OBJECT_TYPE_ARRAY, Array)                                                                                 \
-	XX(JERRY_OBJECT_TYPE_PROXY, Proxy)                                                                                 \
-	XX(JERRY_OBJECT_TYPE_SCRIPT, Script)                                                                               \
-	XX(JERRY_OBJECT_TYPE_MODULE, Module)                                                                               \
-	XX(JERRY_OBJECT_TYPE_PROMISE, Promise)                                                                             \
-	XX(JERRY_OBJECT_TYPE_DATAVIEW, Dataview)                                                                           \
-	XX(JERRY_OBJECT_TYPE_FUNCTION, Function)                                                                           \
-	XX(JERRY_OBJECT_TYPE_TYPEDARRAY, TypedArray)                                                                       \
-	XX(JERRY_OBJECT_TYPE_ITERATOR, Iterator)                                                                           \
-	XX(JERRY_OBJECT_TYPE_CONTAINER, Container)                                                                         \
-	XX(JERRY_OBJECT_TYPE_ERROR, Error)                                                                                 \
-	XX(JERRY_OBJECT_TYPE_ARRAYBUFFER, ArrayBuffer)                                                                     \
-	XX(JERRY_OBJECT_TYPE_SHARED_ARRAY_BUFFER, SharedArrayBuffer)                                                       \
-	XX(JERRY_OBJECT_TYPE_ARGUMENTS, Arguments)                                                                         \
-	XX(JERRY_OBJECT_TYPE_BOOLEAN, Boolean)                                                                             \
-	XX(JERRY_OBJECT_TYPE_DATE, Date)                                                                                   \
-	XX(JERRY_OBJECT_TYPE_NUMBER, Number)                                                                               \
-	XX(JERRY_OBJECT_TYPE_REGEXP, Regexp)                                                                               \
-	XX(JERRY_OBJECT_TYPE_STRING, String)                                                                               \
-	XX(JERRY_OBJECT_TYPE_SYMBOL, Symbol)                                                                               \
-	XX(JERRY_OBJECT_TYPE_GENERATOR, Generator)                                                                         \
-	XX(JERRY_OBJECT_TYPE_BIGINT, BigInt)                                                                               \
-	XX(JERRY_OBJECT_TYPE_WEAKREF, WeakRef)
-
 enum class ObjectType {
-#define XX(jot, ot) ot = jot,
+#define XX(jt, t) t = jt,
 	JERRY_OBJECT_TYPE_MAP(XX)
 #undef XX
 };
 
-#define JERRY_FUNCTION_TYPE_MAP(XX)                                                                                    \
-	XX(JERRY_FUNCTION_TYPE_NONE, None)                                                                                 \
-	XX(JERRY_FUNCTION_TYPE_GENERIC, Generic)                                                                           \
-	XX(JERRY_FUNCTION_TYPE_ACCESSOR, Accessor)                                                                         \
-	XX(JERRY_FUNCTION_TYPE_BOUND, Bound)                                                                               \
-	XX(JERRY_FUNCTION_TYPE_ARROW, Arrow)                                                                               \
-	XX(JERRY_FUNCTION_TYPE_GENERATOR, Generator)
-
 enum class FunctionType {
-#define XX(jft, ft) ft = jft,
+#define XX(jt, t) t = jt,
 	JERRY_FUNCTION_TYPE_MAP(XX)
+#undef XX
+};
+
+enum class Feature {
+#define XX(jt, t) t = jt,
+	JERRY_FEATURE_MAP(XX)
+#undef XX
+};
+
+// ECMA values used where simple assignment or check is all that is required
+#define JERRY_ECMA_MAP(XX)                                                                                             \
+	XX(VALUE_EMPTY, 0x08)                                                                                              \
+	XX(VALUE_FALSE, 0x28)                                                                                              \
+	XX(VALUE_TRUE, 0x38)                                                                                               \
+	XX(VALUE_UNDEFINED, 0x48)                                                                                          \
+	XX(VALUE_NULL, 0x58)                                                                                               \
+	XX(VALUE_TYPE_MASK, 0x07)                                                                                          \
+	XX(TYPE_ERROR, 0x07)                                                                                               \
+	XX(TYPE_OBJECT, 0x03)
+
+enum class Ecma {
+#define XX(name, value) name = value,
+	JERRY_ECMA_MAP(XX)
 #undef XX
 };
 
@@ -141,7 +101,11 @@ struct StringValue {
  * e.g. `Value myValue = Undefined{};`
  */
 struct Undefined {
-	jerry_value_t value = ECMA_VALUE_UNDEFINED;
+	Undefined()
+	{
+	}
+
+	const jerry_value_t value = jerry_value_t(Ecma::VALUE_UNDEFINED);
 };
 
 /**
@@ -150,7 +114,11 @@ struct Undefined {
  * e.g. `Value myValue = Null{};`
  */
 struct Null {
-	jerry_value_t value = ECMA_VALUE_NULL;
+	Null()
+	{
+	}
+
+	const jerry_value_t value = jerry_value_t(Ecma::VALUE_NULL);
 };
 
 class Object;
@@ -215,11 +183,11 @@ public:
 	{
 	}
 
-	Value(const Undefined&) : value(ECMA_VALUE_UNDEFINED)
+	Value(const Undefined& value) : value(value.value)
 	{
 	}
 
-	Value(const Null&) : value(ECMA_VALUE_NULL)
+	Value(const Null& value) : value(value.value)
 	{
 	}
 
@@ -235,6 +203,7 @@ public:
 	 */
 	Value(Value&& value)
 	{
+		reset();
 		std::swap(this->value, value.value);
 	}
 
@@ -246,43 +215,38 @@ public:
 	/**
 	 * @brief Integer
 	 */
-	Value(int value) : Value(OwnedValue{ecma_make_int32_value(value)})
-	{
-	}
+	Value(int value);
 
 	/**
 	 * @brief Unsigned integer
 	 */
-	Value(unsigned value) : Value(OwnedValue{ecma_make_uint32_value(value)})
-	{
-	}
+	Value(unsigned value);
 
 	/**
 	 * @brief floating-point
 	 */
-	Value(double value) : Value(OwnedValue{jerry_create_number(value)})
+	Value(double value) : value(jerry_create_number(value))
 	{
 	}
 
 	/**
 	 * @brief Boolean
 	 */
-	Value(bool value) : Value(OwnedValue{jerry_create_boolean(value)})
+	Value(bool value) : value(jerry_create_boolean(value))
 	{
 	}
 
 	/**
 	 * @brief Wiring String
 	 */
-	Value(const String& s)
-		: Value(OwnedValue{jerry_create_string_sz(reinterpret_cast<const jerry_char_t*>(s.c_str()), s.length())})
+	Value(const String& s) : value(jerry_create_string_sz(reinterpret_cast<const jerry_char_t*>(s.c_str()), s.length()))
 	{
 	}
 
 	/**
 	 * @brief NUL-terminated 'C' string
 	 */
-	Value(const char* s) : Value(OwnedValue{jerry_create_string(reinterpret_cast<const jerry_char_t*>(s))})
+	Value(const char* s) : value(jerry_create_string(reinterpret_cast<const jerry_char_t*>(s)))
 	{
 	}
 
@@ -313,20 +277,22 @@ public:
 	 */
 	Value& operator=(Value&& value)
 	{
-		reset();
-		std::swap(this->value, value.value);
+		if(this != &value) {
+			reset();
+			std::swap(this->value, value.value);
+		}
 		return *this;
 	}
 
 	/**
 	 * @brief Reset contents of object to new value (default is unassigned)
 	 */
-	Value& reset(jerry_value_t value = ECMA_VALUE_EMPTY)
+	Value& reset(jerry_value_t value = jerry_value_t(Ecma::VALUE_EMPTY))
 	{
-		if(value != this->value) {
+		if(!isEmpty()) {
 			jerry_release_value(this->value);
-			this->value = value;
 		}
+		this->value = value;
 		return *this;
 	}
 
@@ -358,7 +324,7 @@ public:
 	jerry_value_t release()
 	{
 		auto res = value;
-		value = ECMA_VALUE_EMPTY;
+		value = jerry_value_t(Ecma::VALUE_EMPTY);
 		return res;
 	}
 
@@ -389,7 +355,7 @@ public:
 	 */
 	bool isError() const
 	{
-		return jerry_value_is_error(value);
+		return ecmaType() == Ecma::TYPE_ERROR;
 	}
 
 	/**
@@ -398,7 +364,7 @@ public:
 	 */
 	bool isEmpty() const
 	{
-		return value != ECMA_VALUE_EMPTY;
+		return Ecma(value) == Ecma::VALUE_EMPTY;
 	}
 
 	/**
@@ -406,7 +372,7 @@ public:
 	 */
 	bool isDefined() const
 	{
-		return value != ECMA_VALUE_UNDEFINED;
+		return Ecma(value) != Ecma::VALUE_UNDEFINED;
 	}
 
 	/**
@@ -422,7 +388,7 @@ public:
 	 */
 	bool isFalse() const
 	{
-		return value == ECMA_VALUE_FALSE;
+		return Ecma(value) == Ecma::VALUE_FALSE;
 	}
 
 	/**
@@ -430,7 +396,7 @@ public:
 	 */
 	bool isTrue() const
 	{
-		return value == ECMA_VALUE_TRUE;
+		return Ecma(value) == Ecma::VALUE_TRUE;
 	}
 
 	/**
@@ -438,7 +404,7 @@ public:
 	 */
 	bool isNull() const
 	{
-		return value == ECMA_VALUE_NULL;
+		return Ecma(value) == Ecma::VALUE_NULL;
 	}
 
 	/**
@@ -454,7 +420,7 @@ public:
 	 */
 	bool isObject() const
 	{
-		return jerry_value_is_object(value);
+		return ecmaType() == Ecma::TYPE_OBJECT;
 	}
 
 	/**
@@ -559,7 +525,12 @@ public:
 	}
 
 private:
-	jerry_value_t value{ECMA_VALUE_EMPTY};
+	Ecma ecmaType() const
+	{
+		return Ecma(value & unsigned(Ecma::VALUE_TYPE_MASK));
+	}
+
+	jerry_value_t value{jerry_value_t(Ecma::VALUE_EMPTY)};
 };
 
 /**
@@ -1046,7 +1017,7 @@ public:
 };
 
 /**
- * @brief Get global object
+ * @brief Get global context
  */
 inline Object global()
 {

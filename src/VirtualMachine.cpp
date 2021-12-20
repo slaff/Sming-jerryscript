@@ -18,10 +18,10 @@ void initialise(jerry_init_flag_t flags)
 {
 	jerry_init(flags);
 
-	auto realm = global();
-	realm.registerFunction("print", printFunction);
+	auto context = global();
+	context.registerFunction("print", printFunction);
 #ifdef DEBUG
-	realm.registerFunction("alert", alertFunction);
+	context.registerFunction("alert", alertFunction);
 #endif
 }
 

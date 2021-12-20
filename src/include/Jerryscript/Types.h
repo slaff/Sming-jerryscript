@@ -1017,7 +1017,7 @@ public:
 };
 
 /**
- * @brief Get global object
+ * @brief Get global context
  */
 inline Object global()
 {

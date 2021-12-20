@@ -22,9 +22,9 @@ namespace Jerryscript
 class Task : public ::Task
 {
 public:
-	Task(const Object& realm, unsigned intervalMs = 500) : intervalMs(intervalMs)
+	Task(const Object& context, unsigned intervalMs = 500) : intervalMs(intervalMs)
 	{
-		this->realm.reset(new Object(realm));
+		this->context.reset(new Object(context));
 	}
 
 	Task(unsigned intervalMs = 500) : intervalMs(intervalMs)
@@ -33,11 +33,11 @@ public:
 
 	void loop() override
 	{
-		if(!realm) {
-			realm.reset(new Object(global()));
+		if(!context) {
+			context.reset(new Object(global()));
 		}
 
-		auto res = realm->runFunction("loop");
+		auto res = context->runFunction("loop");
 		if(res.isError()) {
 			error = String(Error(res)) + FS(" error running loop function: Suspending task.");
 			suspend();
@@ -60,7 +60,7 @@ public:
 	}
 
 private:
-	std::unique_ptr<Object> realm;
+	std::unique_ptr<Object> context;
 	unsigned intervalMs;
 	String error;
 };

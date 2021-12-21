@@ -47,13 +47,13 @@ calls into Jerryscript using the library exception handler:
 
 JS_TRY:
    Place code here which sets up jerryscript values, etc. then calls into Jerryscript.
-   Data is allocated on local stack or in jerryscript engine.
+   Data is allocated on the local stack or in the jerryscript engine.
 
    DO NOT perform any system heap allocation here, such as creating or modifying `String`) objects.
    If required, instantiate those above.
 
 JS_CATCH:
-   Jerryscript ust be re-initialised before any further calls.
+   Jerryscript must be re-initialised before any further calls.
 
    - De-allocate any globally held jerryscript values
    - Call JS::cleanup()
@@ -62,9 +62,9 @@ JS_CATCH:
    It is recommended to provide a single function for both
    initial jerryscript initialisation and re-initialisation.
 
-See the ``Event_Jsvm`` sample for a demonstratation.
+See the ``Event_Jsvm`` sample for a demonstration.
 
-Note that the VM uses own static heap (sized by :envvar:`JERRY_GLOBAL_HEAP_SIZE`) so main system heap is unaffected.
+Note that the VM uses its own static heap (sized by :envvar:`JERRY_GLOBAL_HEAP_SIZE`) so the main system heap is unaffected.
 
 When :envvar:`JERRY_ENABLE_DEBUG` is enabled it may not be possible to recover because VM objects may be left with
 invalid reference counts, for example, which will cause :cpp:func:`Jerryscript::cleanup` to fail.

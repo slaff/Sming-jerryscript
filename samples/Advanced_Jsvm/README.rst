@@ -1,7 +1,7 @@
 Advanced_Jsvm
 =============
 
-.. highligh:: bash
+.. highlight:: bash
 
 To save space and be able to run JerryScript on an embedded device, this library builds without parser support.
 

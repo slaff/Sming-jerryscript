@@ -13,6 +13,7 @@
 #include <sys/time.h>
 
 #include "include/Jerryscript/Except.h"
+#include "include/Jerryscript/Context.h"
 #include <include/jerryscript-port.h>
 #include <include/jerryscript-core.h>
 #include <debug_progmem.h>
@@ -77,4 +78,14 @@ jerry_value_t jerry_port_module_resolve(const jerry_value_t specifier, /**< modu
 	(void)user_p;
 
 	return jerry_create_error(JERRY_ERROR_REFERENCE, nullptr);
+}
+
+/**
+ * Get the current context.
+ *
+ * @return the pointer to the current context
+ */
+jerry_context_t* jerry_port_get_current_context(void)
+{
+	return Jerryscript::Context::getCurrent();
 }

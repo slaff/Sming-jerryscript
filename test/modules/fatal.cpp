@@ -30,7 +30,7 @@ public:
 	{
 		JS::initialise();
 
-		auto context = JS::global();
+		auto object = JS::global();
 
 #ifndef JERRY_ESNEXT
 		TEST_CASE("Bad bytecode")
@@ -45,7 +45,7 @@ public:
 			{
 				debug_i("%s", String(e).c_str());
 			}
-			auto res = context.runFunction("init");
+			auto res = object.runFunction("init");
 			printValue("runFunction", res);
 			REQUIRE(res.isError());
 		}
@@ -56,7 +56,7 @@ public:
 			auto res = JS::Snapshot::load(fatalSnap);
 			printValue("res", res);
 			REQUIRE(!res.isError());
-			REQUIRE(context.registerFunction("throwTantrum", throwTantrum));
+			REQUIRE(object.registerFunction("throwTantrum", throwTantrum));
 		}
 
 		TEST_CASE("Memory")
@@ -64,7 +64,7 @@ public:
 			JS::Object dbg;
 			JS_TRY()
 			{
-				context.runFunction("allocateArray", {4000, 3.5, dbg});
+				object.runFunction("allocateArray", {4000, 3.5, dbg});
 				TEST_ASSERT(false);
 			}
 			JS_CATCH()
@@ -76,7 +76,7 @@ public:
 
 		TEST_CASE("Shutdown VM")
 		{
-			context.reset();
+			object.reset();
 			JS::cleanup();
 			auto heapUsed = JS::getHeapUsed();
 			debug_i("Heap used: %u", heapUsed);

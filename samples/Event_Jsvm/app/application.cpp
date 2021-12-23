@@ -76,9 +76,9 @@ bool triggerEvent(const String& name, const JS::Object& params)
 		event["name"] = name;
 		event["params"] = params;
 
-		auto context = JS::global();
+		auto object = JS::global();
 		for(auto& listener : events[name]) {
-			listener.call(context, event);
+			listener.call(object, event);
 		}
 
 		return true;

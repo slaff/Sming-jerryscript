@@ -22,6 +22,15 @@ To save space and be able to run JerryScript on an embedded device Sming compile
 This means that the JavaScript files have to be compiled before landing on the device.
 See the samples below to learn more.
 
+Console messages
+----------------
+
+Two external functions are made available for scripts to use:
+
+- ``print`` for normal console output (shown in AQUA)
+- ``alert`` for messages in debug mode (show in RED)
+
+
 VM integrity
 ------------
 

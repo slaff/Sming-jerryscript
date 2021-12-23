@@ -19,8 +19,11 @@ namespace JS
 Value alertFunction(const CallInfo& callInfo, Value& str)
 {
 	String s = str.toString();
+	m_puts("\x1b[1;31m");
 	m_nputs(s.c_str(), s.length());
+	m_puts("\x1b[0m");
 	m_putc('\n');
+
 	return true;
 }
 
@@ -28,6 +31,7 @@ Value printFunction(const CallInfo&, Value args[], unsigned argCount)
 {
 	Value ret_val = Undefined{};
 
+	m_puts("\x1b[1;36m");
 	for(unsigned i = 0; i < argCount; i++) {
 		Value str_val = args[i].toString();
 		if(str_val.isError()) {
@@ -49,8 +53,7 @@ Value printFunction(const CallInfo&, Value args[], unsigned argCount)
 			pos += len;
 		}
 	}
-
-	m_putc('\n');
+	m_puts("\x1b[0m\n");
 
 	return ret_val;
 }

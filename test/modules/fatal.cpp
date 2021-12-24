@@ -20,7 +20,7 @@ public:
 
 	void execute() override
 	{
-		JS::initialise();
+		initContext();
 
 		auto object = JS::global();
 

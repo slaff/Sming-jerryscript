@@ -1,5 +1,9 @@
 #include <JerryTest.h>
 
+#ifdef JERRY_EXTERNAL_CONTEXT
+JS::Context globalContext;
+#endif
+
 void printValue(const String& name, const JS::Value& value)
 {
 	Serial.print(name);
@@ -12,4 +16,3 @@ void printValue(const String& name, const JS::Value& value)
 		Serial.println(value);
 	}
 }
-

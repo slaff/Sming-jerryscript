@@ -12,22 +12,11 @@
 #include <stdarg.h>
 #include <sys/time.h>
 
+#include "include/Jerryscript/Except.h"
 #include <include/jerryscript-port.h>
 #include <include/jerryscript-core.h>
 #include <debug_progmem.h>
 #include <Platform/RTC.h>
-
-/**
- * Provide console message implementation for the engine.
- */
-void jerry_port_console(const char* format, /**< format string */
-						...)				/**< parameters */
-{
-	va_list args;
-	va_start(args, format);
-	m_vprintf(format, args);
-	va_end(args);
-} /* jerry_port_console */
 
 /**
  * Provide log message implementation for the engine.
@@ -42,7 +31,7 @@ void jerry_port_log(jerry_log_level_t level, /**< log level */
 	va_start(args, format);
 	m_vprintf(format, args);
 	va_end(args);
-} /* jerry_port_log */
+}
 
 /**
  * Default implementation of jerry_port_get_current_time.
@@ -71,8 +60,8 @@ double jerry_port_get_local_time_zone_adjustment(double unix_ms, /**< ms since u
  */
 void jerry_port_fatal(jerry_fatal_code_t code)
 {
-	abort();
-} /* jerry_port_fatal */
+	Jerryscript::Except::raise(code);
+}
 
 /**
  * Default module resolver.

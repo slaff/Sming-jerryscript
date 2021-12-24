@@ -54,11 +54,14 @@ namespace Snapshot
 {
 /**
  * @name Load a snapshot into the virtual machine and execute it
+ * @{
+ */
+
+/**
  * @brief Load from memory buffer
  * @param snapshot Points to snapshot content
  * @param snapshotSize Number of bytes in snapshot
  * @retval Value Result from execution, or Error
- * @{
  */
 Value load(const uint32_t* snapshot, size_t snapshotSize);
 
@@ -81,6 +84,7 @@ inline Value loadFromFile(const String& fileName)
 {
 	return load(fileGetContent(fileName));
 }
+
 /** @} */
 
 } // namespace Snapshot

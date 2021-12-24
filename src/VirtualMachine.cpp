@@ -20,7 +20,7 @@ void initialise(jerry_init_flag_t flags)
 
 	auto context = global();
 	context.registerFunction("print", printFunction);
-#ifdef DEBUG
+#if DEBUG_BUILD
 	context.registerFunction("alert", alertFunction);
 #endif
 }

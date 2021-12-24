@@ -48,6 +48,8 @@ Value addEventListener(const CallInfo& callInfo, Value& eventName, Callable& fun
 
 JS_DEFINE_FUNCTION(addEventListener, 2)
 
+void startJsvm();
+
 /*
  * Dispatch an event to all registered listeners
  *
@@ -67,21 +69,38 @@ bool triggerEvent(const String& name, const JS::Object& params)
 		return false;
 	}
 
-	// Build the event object...
-	JS::Object event;
-	event["name"] = name;
-	event["params"] = params;
+	JS_TRY()
+	{
+		// Build the event object...
+		JS::Object event;
+		event["name"] = name;
+		event["params"] = params;
 
-	auto context = JS::global();
-	for(auto& listener : events[name]) {
-		listener.call(context, event);
+		auto object = JS::global();
+		for(auto& listener : events[name]) {
+			listener.call(object, event);
+		}
+
+		return true;
 	}
-
-	return true;
+	JS_CATCH()
+	{
+		debug_i("%s", String(e).c_str());
+		debug_i("System heap %u", system_get_free_heap_size());
+		System.queueCallback(startJsvm);
+		return false;
+	}
 }
 
+/*
+ * Called at startup to initialise our jerryscript engine,
+ * Also called on fatal exceptiuon to re-initialise.
+ */
 void startJsvm()
 {
+	// Release any allocated jerryscript values
+	events.clear();
+
 	JS::initialise();
 
 	auto context = JS::global();

@@ -35,15 +35,15 @@ public:
 	{
 		JS::initialise();
 
-		auto realm = JS::global();
+		auto object = JS::global();
 
 		TEST_CASE("Start VM")
 		{
 			DEFINE_FSTR_LOCAL(FS_moduleLoaded, "OK, module loaded!");
 			DEFINE_FSTR_LOCAL(FS_addEventListener, "addEventListener");
 			REQUIRE(FS_moduleLoaded == JS::Snapshot::load(eventSnap));
-			REQUIRE(realm.registerFunction(FS_addEventListener, addEventListener));
-			REQUIRE(!realm.runFunction("init").isError());
+			REQUIRE(object.registerFunction(FS_addEventListener, addEventListener));
+			REQUIRE(!object.runFunction("init").isError());
 		}
 
 		TEST_CASE("Create error")
@@ -69,13 +69,13 @@ public:
 			JS::Value res;
 			JS::Value prop;
 
-			res = listeners[0].call(realm, event);
+			res = listeners[0].call(object, event);
 			printValue(F("listeners[0].call"), res);
 			REQUIRE_EQ(res.type(), JS::Type::String);
 			REQUIRE_EQ(res.as<String>(), "one");
 
 			arg2["value"] = true;
-			res = listeners[1].call(realm, {event, arg2});
+			res = listeners[1].call(object, {event, arg2});
 			printValue(F("listeners[1].call"), res);
 			REQUIRE_EQ(res.type(), JS::Type::Number);
 			REQUIRE_EQ(res.as<unsigned>(), 2);
@@ -84,7 +84,7 @@ public:
 			REQUIRE_EQ(prop.as<unsigned>(), 2);
 
 			arg2["value"] = 12.5;
-			res = listeners[2].call(realm, {event, arg2});
+			res = listeners[2].call(object, {event, arg2});
 			printValue(F("listeners[2].call"), res);
 			REQUIRE_EQ(res.type(), JS::Type::Number);
 			REQUIRE_EQ(res.as<float>(), 3.5);
@@ -97,7 +97,7 @@ public:
 
 		TEST_CASE("Shutdown VM")
 		{
-			realm.reset();
+			object.reset();
 			events.clear();
 			JS::cleanup();
 

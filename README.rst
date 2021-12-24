@@ -16,7 +16,7 @@ The library uses JerryScript as JavaScript Virtual Machine (VM).
 The diagram above shows the interactions between the major components of JerryScript: Parser and VM. 
 Parser performs translation of input ECMAScript application into the byte-code. 
 Prepared bytecode is executed by the Virtual Machine that performs interpretation.
-Source:  `Official JerryScript site <https://github.com/jerryscript-project/jerryscript/blob/master/docs/04.INTERNALS.md>`_. 
+Source: `Official JerryScript site <https://github.com/jerryscript-project/jerryscript/blob/master/docs/04.INTERNALS.md>`_.
 
 To save space and be able to run JerryScript on an embedded device Sming compiles this library without a parser.
 This means that the JavaScript files have to be compiled before landing on the device.
@@ -79,13 +79,6 @@ When :envvar:`JERRY_ENABLE_DEBUG` is enabled it may not be possible to recover b
 invalid reference counts, for example, which will cause :cpp:func:`Jerryscript::cleanup` to fail.
 Applications should generally be built with this setting disabled (the default).
 
-
-Version
--------
-
-.. toctree::
-
-   JerryScriptUpdate
 
 Configuration variables
 -----------------------
@@ -179,9 +172,7 @@ Credits
 
 The initial work on the JerryScript library for Sming was done as part of the `U:Kit project <https://github.com/attachix/ukit>`_. 
 
+.. toctree::
+   :glob:
 
-API Documentation
------------------
-
-.. doxygennamespace:: Jerryscript
-   :members:
+   *

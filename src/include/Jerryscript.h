@@ -7,11 +7,6 @@
 #include "Jerryscript/Function.h"
 #include "Jerryscript/Except.h"
 
-namespace JS
-{
-using namespace Jerryscript;
-}
-
 #else
 
 #include_next <jerryscript.h>

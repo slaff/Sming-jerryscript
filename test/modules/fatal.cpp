@@ -5,19 +5,11 @@ namespace
 IMPORT_FSTR(fatalSnap, PROJECT_DIR "/out/jerryscript/fatal.js.snap")
 IMPORT_FSTR(fatalEsNextSnap, PROJECT_DIR "/files/fatal.es.next.js.snap")
 
-namespace JS
-{
-using namespace Jerryscript;
-
-Value throwTantrum(const CallInfo& callInfo, Value& reason)
+JS_DEFINE_FUNCTION(throwTantrum, 1, JS::Value& reason)
 {
 	// todo
 	return true;
 }
-
-} // namespace JS
-
-JS_DEFINE_FUNCTION(throwTantrum, 1)
 
 class FatalTest : public TestGroup
 {

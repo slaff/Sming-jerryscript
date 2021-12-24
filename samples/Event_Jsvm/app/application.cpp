@@ -30,7 +30,7 @@ IMPORT_FSTR(main_snap, PROJECT_DIR "/out/jerryscript/main.js.snap")
  * @endcode
  *
  */
-JS_DEFINE_FUNCTION(addEventListener, 2, JS::Value& eventName, JS::Callable& function)
+JS_DEFINE_FUNCTION(addEventListener, JS::Value& eventName, JS::Callable& function)
 {
 	if(!eventName.isString() || !function.isCallable()) {
 		return JS::ArgumentError(__FUNCTION__);

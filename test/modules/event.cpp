@@ -6,7 +6,7 @@ IMPORT_FSTR(eventSnap, PROJECT_DIR "/out/jerryscript/event.js.snap")
 DEFINE_FSTR(testEventName, "EVENT_TEMP")
 HashMap<String, Vector<JS::Callable>> events;
 
-JS_DEFINE_FUNCTION(addEventListener, 2, JS::Value& eventName, JS::Callable& function)
+JS_DEFINE_FUNCTION(addEventListener, JS::Value& eventName, JS::Callable& function)
 {
 	if(!eventName.isString() || !function.isCallable()) {
 		return JS::ArgumentError(__FUNCTION__);

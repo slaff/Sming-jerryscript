@@ -19,7 +19,7 @@ public:
 
 protected:
 	// This gets invoked when we run the javascriopt 'test' function
-	JS_DEFINE_METHOD(callback, 1, JS::Value& param)
+	JS_DEFINE_METHOD(callback, JS::Value& param)
 	{
 		JS::global()["result"] = param;
 		return true;

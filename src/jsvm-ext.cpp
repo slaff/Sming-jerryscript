@@ -12,7 +12,7 @@
 #include "jsvm-ext.h"
 #include <m_printf.h>
 
-JS_DEFINE_FUNCTION(alertFunction, 1, JS::Value& str)
+JS_DEFINE_FUNCTION(alertFunction, JS::Value& str)
 {
 	String s = str.toString();
 	m_puts("\x1b[1;31m");

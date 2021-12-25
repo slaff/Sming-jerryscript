@@ -34,7 +34,7 @@ public:
 protected:
 	bool triggerEvent(const String& name, const JS::Object& params);
 
-	JS_DEFINE_METHOD(addEventListener, 2, JS::Value& eventName, JS::Callable& function)
+	JS_DEFINE_METHOD(addEventListener, JS::Value& eventName, JS::Callable& function)
 	{
 		debug_i("%s.addListener('%s', %p)", getName().c_str(), String(eventName).c_str(), function.get());
 		events[eventName].add(function);

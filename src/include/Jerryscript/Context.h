@@ -30,7 +30,6 @@
 /**
  * @brief Argument list is fixed
  * @param method Name of jerryscript wrapper function
- * @param num_args Number of arguments (cannot be deduced)
  * @param ... Argument definitions
  *
  * Example:
@@ -55,17 +54,17 @@
  * };
  * ```
  */
-#define JS_DEFINE_METHOD(method, num_args, ...)                                                                        \
+#define JS_DEFINE_METHOD(method, ...)                                                                                  \
 	static jerry_value_t method(const jerry_call_info_t* call_info_p, const jerry_value_t args[],                      \
 								const jerry_length_t args_count)                                                       \
 	{                                                                                                                  \
 		using Method = JS::Value (ContextClass::*)(const jerry_call_info_t*, ...);                                     \
-		if(num_args != args_count) {                                                                                   \
+		if(JS_NARG(__VA_ARGS__) != args_count) {                                                                       \
 			return JS::create_arg_count_error(__FUNCTION__);                                                           \
 		}                                                                                                              \
 		auto& ctx = getCurrent();                                                                                      \
 		auto m = reinterpret_cast<Method>(&ContextClass::js_##method);                                                 \
-		auto res = (ctx.*m)(call_info_p JS_ARGS_##num_args);                                                           \
+		auto res = (ctx.*m)(call_info_p JS_CONCAT(JS_ARGS_, JS_NARG(__VA_ARGS__)));                                    \
 		return res.release();                                                                                          \
 	}                                                                                                                  \
 	Jerryscript::Value js_##method(const JS::CallInfo& callInfo, ##__VA_ARGS__)

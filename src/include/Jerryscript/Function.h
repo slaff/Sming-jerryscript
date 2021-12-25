@@ -19,6 +19,18 @@ namespace JS
 using namespace Jerryscript;
 }
 
+// get number of arguments with JS_NARG
+// https://newbedev.com/overloading-macro-on-number-of-arguments
+// https://gcc.gnu.org/onlinedocs/cpp/Variadic-Macros.html
+#define JS_NARG(...) JS_NARG_I(_0 __VA_OPT__(, ) __VA_ARGS__, JS_RSEQ_N)
+#define JS_NARG_I(...) JS_ARG_N(__VA_ARGS__)
+#define JS_ARG_N(_0, _1, _2, _3, _4, _5, _6, _7, _8, N, ...) N
+#define JS_RSEQ_N 8, 7, 6, 5, 4, 3, 2, 1, 0
+static_assert(JS_NARG() == 0 && JS_NARG(!, !) == 2, "JS_NARG broken");
+
+#define JS_CONCAT_(x, y) x##y
+#define JS_CONCAT(x, y) JS_CONCAT_(x, y)
+
 #define JS_ARGS_0
 #define JS_ARGS_1 JS_ARGS_0, &args[0]
 #define JS_ARGS_2 JS_ARGS_1, &args[1]
@@ -44,13 +56,12 @@ using namespace Jerryscript;
 /**
  * @brief Argument list is fixed
  * @param func Name of jerryscript wrapper function
- * @param num_args Number of arguments expected by function
  * @param ... Argument definitions
  *
  * Example:
  *
  * ```
- * JS_DEFINE_FUNCTION(myFunction, 2, JS::Value& arg1, JS::Array& arg2)
+ * JS_DEFINE_FUNCTION(myFunction, JS::Value& arg1, JS::Array& arg2)
  * {
  *   ...
  *   return ...;
@@ -58,16 +69,16 @@ using namespace Jerryscript;
  * ```
  *
  */
-#define JS_DEFINE_FUNCTION(func, num_args, ...)                                                                        \
+#define JS_DEFINE_FUNCTION(func, ...)                                                                                  \
 	JS::Value js_##func(const JS::CallInfo& callInfo, ##__VA_ARGS__);                                                  \
 	jerry_value_t func(const jerry_call_info_t* call_info_p, const jerry_value_t args[],                               \
 					   const jerry_length_t args_count)                                                                \
 	{                                                                                                                  \
 		using Function = JS::Value (*)(const jerry_call_info_t*, ...);                                                 \
-		if(num_args != args_count) {                                                                                   \
+		if(JS_NARG(__VA_ARGS__) != args_count) {                                                                       \
 			return JS::create_arg_count_error(__FUNCTION__);                                                           \
 		}                                                                                                              \
-		auto res = Function(js_##func)(call_info_p JS_ARGS_##num_args);                                                \
+		auto res = Function(js_##func)(call_info_p JS_CONCAT(JS_ARGS_, JS_NARG(__VA_ARGS__)));                         \
 		return res.release();                                                                                          \
 	}                                                                                                                  \
 	JS::Value js_##func(const Jerryscript::CallInfo& callInfo, ##__VA_ARGS__)

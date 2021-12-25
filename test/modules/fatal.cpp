@@ -5,7 +5,7 @@ namespace
 IMPORT_FSTR(fatalSnap, PROJECT_DIR "/out/jerryscript/fatal.js.snap")
 IMPORT_FSTR(fatalEsNextSnap, PROJECT_DIR "/files/fatal.es.next.js.snap")
 
-JS_DEFINE_FUNCTION(throwTantrum, 1, JS::Value& reason)
+JS_DEFINE_FUNCTION(throwTantrum, JS::Value& reason)
 {
 	// todo
 	return true;

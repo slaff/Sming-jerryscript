@@ -80,6 +80,16 @@ invalid reference counts, for example, which will cause :cpp:func:`Jerryscript::
 Applications should generally be built with this setting disabled (the default).
 
 
+External Contexts
+-----------------
+
+By default, a single, global VM context is created in which all code is loaded and executed.
+If multiple javascript applications are running then if one fails it will take out all the others.
+
+Enabling the :envvar:`JERRY_EXTERNAL_CONTEXT` setting allows use of the :cpp:class:`JS::Context`
+class to run multiple isolated instances. See the :sample:`Basic_Context` example for details.
+
+
 Configuration variables
 -----------------------
 
@@ -121,6 +131,13 @@ Configuration variables
 
    Enable to build library with javascript parser enabled.
    Required for use of :cpp:func:`Jerryscript::eval` function.
+
+
+.. envvar:: JERRY_EXTERNAL_CONTEXT
+
+   default: 0 (disabled)
+
+   Enable this setting to make use of :cpp:class:`JS::Context` to run multiple isolated instances.
 
 
 .. envvar:: JERRY_GLOBAL_HEAP_SIZE

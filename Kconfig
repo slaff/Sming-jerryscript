@@ -31,4 +31,8 @@ menu "JerryScript"
         help
             Required for use of :cpp:func:`Jerryscript::eval` function.
 
+    config JERRY_EXTERNAL_CONTEXT
+        bool "Enable external contexts for fully isolated containers"
+        default N
+
 endmenu

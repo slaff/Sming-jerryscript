@@ -16,6 +16,8 @@ public:
 		TEST_CASE("eval")
 		{
 			REQUIRE(JS::eval("12 + 7 * 3").as<int>() == 33);
+			auto wdtElapsed = JS::Watchdog::read().as<NanoTime::Microseconds>();
+			debug_i("JS watchdog %s", wdtElapsed.toString().c_str());
 		}
 
 #ifdef JERRY_ESNEXT

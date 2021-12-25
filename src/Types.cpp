@@ -11,6 +11,7 @@
  */
 
 #include "include/Jerryscript/Types.h"
+#include "include/jerry_port_vm.h"
 #include <debug_progmem.h>
 
 extern "C" {
@@ -223,6 +224,19 @@ Error::operator String() const
 Object Value::toObject() const
 {
 	return OwnedValue{jerry_value_to_object(get())};
+}
+
+Value Callable::call(const Object& thisValue, const Value& arg)
+{
+	jerry_port_watchdog_reset();
+	return OwnedValue{jerry_call_function(get(), thisValue.get(), &const_cast<Value&>(arg).get(), 1)};
+}
+
+Value Callable::call(const Object& thisValue, std::initializer_list<Value> args)
+{
+	jerry_port_watchdog_reset();
+	return OwnedValue{
+		jerry_call_function(get(), thisValue.get(), args.size() ? &args.begin()->get() : nullptr, args.size())};
 }
 
 } // namespace Jerryscript

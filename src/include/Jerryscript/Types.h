@@ -990,21 +990,14 @@ public:
 	/**
 	 * @brief Call with one argument
 	 */
-	Value call(const Object& thisValue, const Value& arg)
-	{
-		return OwnedValue{jerry_call_function(get(), thisValue.get(), &const_cast<Value&>(arg).get(), 1)};
-	}
+	Value call(const Object& thisValue, const Value& arg);
 
 	/**
 	 * @brief Call with zero or multiple arguments
 	 *
 	 * e.g. `call(myObject, {1, 2, 3});`
 	 */
-	Value call(const Object& thisValue, std::initializer_list<Value> args = {})
-	{
-		return OwnedValue{
-			jerry_call_function(get(), thisValue.get(), args.size() ? &args.begin()->get() : nullptr, args.size())};
-	}
+	Value call(const Object& thisValue, std::initializer_list<Value> args = {});
 
 	/**
 	 * @brief Get specific type of callable object

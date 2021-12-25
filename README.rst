@@ -80,6 +80,27 @@ invalid reference counts, for example, which will cause :cpp:func:`Jerryscript::
 Applications should generally be built with this setting disabled (the default).
 
 
+Watchdog
+--------
+
+Sming is a single-threaded framework so requires co-operation to perform :doc:`multi-tasking </information/multitasking>`.
+This means javascript calls should be brief so as not to disrupt the system.
+
+If a javascript call takes too long then the system watchdog will timeout and reset the system.
+This is generally not helpful, so a separate watchdog is implemented for the Jerryscript virtual machine.
+
+By default, the watchdog is disabled. To enable it, add a call during initialisation:
+
+.. code-block:: c++
+
+   // Enable the watchdog with a 100ms timeout (0 to disable it)
+   JS::Watchdog::setPeriod(100);
+
+Now, if a call takes more than 100ms then a fatal error will be thrown as discussed above.
+
+The setting can be changed at any time and is unaffected by jerryscript engine resets.
+
+
 External Contexts
 -----------------
 

@@ -24,6 +24,26 @@ public:
 
 		auto object = JS::global();
 
+		TEST_CASE("Watchdog")
+		{
+			auto res = JS::Snapshot::load(fatalSnap);
+			REQUIRE(!res.isError());
+			JS::Watchdog::setPeriod(100);
+			uint32_t startTime = system_get_time();
+			JS_TRY()
+			{
+				auto object = JS::global();
+				object.runFunction(F("infiniteLoop"));
+				TEST_ASSERT(false);
+			}
+			JS_CATCH()
+			{
+				auto wdtElapsed = JS::Watchdog::read().as<NanoTime::Microseconds>();
+				uint32_t timeElapsed = system_get_time() - startTime;
+				debug_i("Time %u, Watchdog %s, %s", timeElapsed, wdtElapsed.toString().c_str(), String(e).c_str());
+			}
+		}
+
 #ifndef JERRY_ESNEXT
 		TEST_CASE("Bad bytecode")
 		{
@@ -61,7 +81,8 @@ public:
 			}
 			JS_CATCH()
 			{
-				debug_i("%s", String(e).c_str());
+				auto wdt = JS::Watchdog::read().as<NanoTime::Microseconds>();
+				debug_i("%s, watchdog %s", String(e).c_str(), wdt.toString().c_str());
 				debug_i("Function failed @ i = %u", JS::Value(dbg["count"]).as<int>());
 			}
 		}

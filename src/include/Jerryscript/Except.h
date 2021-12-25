@@ -10,7 +10,7 @@
  *
  */
 
-#include "include/Jerryscript/Types.h"
+#include "Types.h"
 #include <csetjmp>
 
 namespace Jerryscript

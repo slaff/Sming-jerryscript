@@ -12,7 +12,7 @@ public:
 
 	void execute() override
 	{
-		JS::initialise();
+		initContext();
 
 		// Initialise some intrinsics which don't get tidied by garbage collection
 		{

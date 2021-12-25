@@ -8,10 +8,6 @@ HashMap<String, JS::Callable::List> events;
 
 IMPORT_FSTR(main_snap, PROJECT_DIR "/out/jerryscript/main.js.snap")
 
-namespace JS
-{
-using namespace Jerryscript;
-
 /**
  * @brief Function to register event listeners
  *
@@ -34,19 +30,15 @@ using namespace Jerryscript;
  * @endcode
  *
  */
-Value addEventListener(const CallInfo& callInfo, Value& eventName, Callable& function)
+JS_DEFINE_FUNCTION(addEventListener, 2, JS::Value& eventName, JS::Callable& function)
 {
 	if(!eventName.isString() || !function.isCallable()) {
-		return ArgumentError(__FUNCTION__);
+		return JS::ArgumentError(__FUNCTION__);
 	}
 
 	events[eventName].add(function);
 	return true;
 }
-
-} // namespace JS
-
-JS_DEFINE_FUNCTION(addEventListener, 2)
 
 void startJsvm();
 

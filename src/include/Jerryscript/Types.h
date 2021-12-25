@@ -148,7 +148,6 @@ class Callable;
  *   - This is correct:  Value value = OwnedValue{jerry_create_object()};
  *   - This is wrong:    Value value = jerry_create_object(); // Ends up with memory leak plus garbage
  *
- * @endrst
  */
 class Value
 {

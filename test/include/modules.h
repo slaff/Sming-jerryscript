@@ -11,4 +11,5 @@
 	TEST_MAP_DEBUG(XX)                                                                                                 \
 	XX(types)                                                                                                          \
 	XX(event)                                                                                                          \
-	XX(parser)
+	XX(parser)                                                                                                         \
+	XX(context)

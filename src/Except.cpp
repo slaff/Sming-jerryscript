@@ -39,7 +39,9 @@ void Except::raise(jerry_fatal_code_t code)
 		abort();
 	}
 	current->mCode = FatalCode(code);
-	longjmp(current->context, 1);
+	auto& ctx = current->context;
+	current = nullptr;
+	longjmp(ctx, 1);
 }
 
 Except::operator String() const

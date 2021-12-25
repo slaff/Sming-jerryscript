@@ -12,11 +12,7 @@
 #include "jsvm-ext.h"
 #include <m_printf.h>
 
-using namespace Jerryscript;
-
-namespace JS
-{
-Value alertFunction(const CallInfo& callInfo, Value& str)
+JS_DEFINE_FUNCTION(alertFunction, 1, JS::Value& str)
 {
 	String s = str.toString();
 	m_puts("\x1b[1;31m");
@@ -27,13 +23,13 @@ Value alertFunction(const CallInfo& callInfo, Value& str)
 	return true;
 }
 
-Value printFunction(const CallInfo&, Value args[], unsigned argCount)
+JS_DEFINE_FUNCTION_VAR(printFunction)
 {
-	Value ret_val = Undefined{};
+	JS::Value ret_val;
 
 	m_puts("\x1b[1;36m");
 	for(unsigned i = 0; i < argCount; i++) {
-		Value str_val = args[i].toString();
+		auto str_val = args[i].toString();
 		if(str_val.isError()) {
 			ret_val = str_val;
 			break;
@@ -57,8 +53,3 @@ Value printFunction(const CallInfo&, Value args[], unsigned argCount)
 
 	return ret_val;
 }
-
-} // namespace JS
-
-JS_DEFINE_FUNCTION(alertFunction, 1)
-JS_DEFINE_FUNCTION_VAR(printFunction)

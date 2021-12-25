@@ -11,12 +11,7 @@ public:
 
 	void execute() override
 	{
-		if(!JS::isFeatureEnabled(JS::Feature::JsParser)) {
-			debug_i("Parser disabled, skipping tests");
-			return;
-		}
-
-		JS::initialise();
+		initContext();
 
 		TEST_CASE("eval")
 		{
@@ -47,5 +42,7 @@ public:
 
 void REGISTER_TEST(parser)
 {
-	registerGroup<ParserTest>();
+	if(JS::isFeatureEnabled(JS::Feature::JsParser)) {
+		registerGroup<ParserTest>();
+	}
 }

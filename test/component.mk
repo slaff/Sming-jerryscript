@@ -32,7 +32,7 @@ endif
 APP_CFLAGS += -DRESTART_DELAY=$(RESTART_DELAY)
 
 define BuildAndRun
-+$(MAKE) snap-clean
++$(MAKE) snap-clean config-clean
 +$(MAKE) MODULE="$(patsubst %/test,%/,$(MODULE))$1.$3" JERRY_COMPACT_PROFILE=$2 JERRY_ENABLE_DEBUG=$4 $5 run
 endef
 
@@ -43,3 +43,4 @@ execute:
 	$(call BuildAndRun,es.next,0,debug,1)
 	$(call BuildAndRun,es.next,0,release,0)
 	$(call BuildAndRun,parser,0,release,0,JERRY_PARSER=1)
+	$(call BuildAndRun,context,0,release,0,JERRY_EXTERNAL_CONTEXT=1)

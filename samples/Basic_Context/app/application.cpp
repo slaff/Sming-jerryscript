@@ -60,7 +60,7 @@ private:
 	HashMap<String, JS::Callable::List> events;
 };
 
-Vector<MyContext> contexts;
+JS::ContextList<MyContext> contexts;
 SimpleTimer timer;
 IMPORT_FSTR(main_snap, PROJECT_DIR "/out/jerryscript/main.js.snap")
 
@@ -140,8 +140,11 @@ bool MyContext::triggerEvent(const String& name, const JS::Object& params)
 
 void startJsvm()
 {
-	contexts.addElement(new MyContext(F("First")));
-	contexts.addElement(new MyContext(F("Second")));
+	// Allow 100ms max. for each call
+	JS::Watchdog::setPeriod(100);
+
+	contexts.add(new MyContext(F("First")));
+	contexts.add(new MyContext(F("Second")));
 
 	for(auto& ctx : contexts) {
 		ctx.init();
@@ -151,7 +154,7 @@ void startJsvm()
 	 * Tell javascript code to force an out-of-memory fatal error.
 	 * It will get reset but the second context will be unaffected.
 	 */
-	contexts[0].select();
+	contexts.head()->select();
 	JS::global()[F("exceptionEnabled")] = true;
 
 	/*
@@ -160,9 +163,7 @@ void startJsvm()
 	timer.initializeMs<2000>([]() {
 		int temp = random(25, 100);
 		String origin = F("cpu/temp");
-		for(auto& ctx : contexts) {
-			ctx.notifyTemperature(temp, origin);
-		}
+		contexts.foreach([=](auto& ctx) { ctx.notifyTemperature(temp, origin); });
 	});
 	timer.start();
 }

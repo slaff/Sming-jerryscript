@@ -86,5 +86,8 @@ public:
 
 void REGISTER_TEST(fatal)
 {
+// Assertions prevent testing of fatal error paths
+#ifndef JERRY_ENABLE_DEBUG
 	registerGroup<FatalTest>();
+#endif
 }

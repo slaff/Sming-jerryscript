@@ -1,6 +1,6 @@
 COMPONENT_DEPENDS := MultipartParser jerryscript
 
-HWCONFIG := spiffs
+HWCONFIG := spiffs-2m
 DEV_FILES := files/web
 SPIFF_FILES := out/web
 APP_JS_SOURCE_DIR := files/js

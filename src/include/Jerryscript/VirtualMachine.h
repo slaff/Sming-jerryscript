@@ -13,6 +13,7 @@
 
 #include "Types.h"
 #include <FileSystem.h>
+#include <Platform/Clocks.h>
 
 namespace Jerryscript
 {
@@ -38,6 +39,23 @@ inline bool isFeatureEnabled(Feature feature)
 {
 	return jerry_is_feature_enabled(jerry_feature_t(feature));
 }
+
+namespace Watchdog
+{
+/**
+ * @brief Set watchdog period
+ * @param milliseconds Timeout period, use 0 to disable
+ */
+void setPeriod(unsigned milliseconds);
+
+/**
+ * @brief Get elapsed watchdog time since last reset
+ * @retval uint32_t Time in internal timer ticks
+ * @note For debugging and inspection use only
+ */
+Timer2Clock::Ticks<uint32_t> read();
+
+}; // namespace Watchdog
 
 /*
  * @brief Parses the JavaScript code and prepares it for execution

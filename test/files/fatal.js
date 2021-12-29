@@ -12,3 +12,9 @@ function allocateArray(count, value, dbg) {
 
 	return true;
 }
+
+function infiniteLoop() {
+	while (true) {
+		// Help! Watchdog save me please!
+	}
+}

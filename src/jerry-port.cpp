@@ -16,8 +16,16 @@
 #include "include/Jerryscript/Context.h"
 #include <include/jerryscript-port.h>
 #include <include/jerryscript-core.h>
+#include "include/jerry_port_vm.h"
 #include <debug_progmem.h>
 #include <Platform/RTC.h>
+
+struct jerry_port_watchdog_t jerry_port_watchdog;
+
+void jerry_port_watchdog_set_period(uint32_t milliseconds)
+{
+	jerry_port_watchdog.period = uint64_t(milliseconds) * HW_TIMER2_CLK / 1000U;
+}
 
 /**
  * Provide log message implementation for the engine.

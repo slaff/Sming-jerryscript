@@ -13,6 +13,8 @@
 #pragma once
 
 #include "Function.h"
+#include <Data/LinkedObjectList.h>
+#include <Platform/System.h>
 #include <memory>
 
 /**
@@ -183,7 +185,7 @@ private:
 /**
  * @brief Implement a custom Context class
  */
-template <class ClassType> class ContextTemplate : public Context
+template <class ClassType> class ContextTemplate : public LinkedObjectTemplate<ClassType>, public Context
 {
 public:
 	using ContextClass = ClassType;
@@ -193,6 +195,59 @@ public:
 	static ClassType& getCurrent()
 	{
 		return static_cast<ClassType&>(Context::getCurrent());
+	}
+};
+
+/**
+ * @brief Manages a list of contexts
+ */
+template <class ClassType> class ContextList : public OwnedLinkedObjectListTemplate<ClassType>
+{
+public:
+	using Callback = Delegate<void(ClassType& ctx)>;
+
+	/**
+	 * @brief Invoke callback once for each context via task queue
+	 *
+	 * When calling into contexts we can do this:
+	 * 
+	 * ```
+	 * JS::ContextList<MyContext> contexts;
+	 * ...
+	 * String str = F("Some text");
+	 * int value = 12;
+	 * for(auto& ctx: contexts) {
+	 *   ctx.customNotify(str, value);
+	 * }
+	 * ```
+	 *
+	 * However, with many containers system responsiveness may be adversely affected.
+	 * Instead, separate the calls out like this:
+	 *
+	 * ```
+	 * contexts.foreach([=](auto& ctx){
+	 *   ctx.customNotify(str, value);
+	 * });
+	 * ```
+	 *
+	 * Note that all parameters are captured by copy (using `[=]`) as,
+	 * for example, `str` will be destroyed when it goes out of scope.
+	 */
+	void foreach(Callback callback)
+	{
+		runNext(this->head(), callback);
+	}
+
+private:
+	static void runNext(ClassType* ctx, Callback callback)
+	{
+		if(ctx == nullptr) {
+			return;
+		}
+		System.queueCallback([ctx, callback]() {
+			callback(*ctx);
+			runNext(ctx->getNext(), callback);
+		});
 	}
 };
 

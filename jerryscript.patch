@@ -194,3 +194,16 @@ index 91bb3fe3..1f0f1d35 100644
  } jerry_fatal_code_t;
  
  /**
+diff --git a/jerry-core/jrt/jrt-fatals.c b/jerry-core/jrt/jrt-fatals.c
+index 36c02277..94d0934f 100644
+--- a/jerry-core/jrt/jrt-fatals.c
++++ b/jerry-core/jrt/jrt-fatals.c
+@@ -29,7 +29,7 @@
+ void JERRY_ATTR_NORETURN
+ jerry_fatal (jerry_fatal_code_t code) /**< status code */
+ {
+-#ifndef JERRY_NDEBUG
++#if 0
+   switch (code)
+   {
+     case ERR_OUT_OF_MEMORY:

@@ -94,7 +94,7 @@ JERRY_CMAKE_PARAMS := \
 endif
 
 $(JERRY_SNAPSHOT_TOOL):
-	$(Q) $(PYTHON) $(JERRYSCRIPT_ROOT)/tools/build.py \
+	$(Q) CC= $(PYTHON) $(JERRYSCRIPT_ROOT)/tools/build.py \
 		--lto OFF \
 		--jerry-cmdline-snapshot ON \
 		--builddir "$(JERRY_BUILD_DIR)" \

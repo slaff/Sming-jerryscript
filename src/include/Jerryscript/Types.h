@@ -850,9 +850,15 @@ public:
 		unsigned mIndex;
 	};
 
-	class Iterator : public std::iterator<std::random_access_iterator_tag, IndexedItem>
+	class Iterator
 	{
 	public:
+		using iterator_category = std::random_access_iterator_tag;
+		using value_type = IndexedItem;
+		using difference_type = std::ptrdiff_t;
+		using pointer = IndexedItem*;
+		using reference = IndexedItem&;
+
 		Iterator(const Iterator&) = default;
 
 		Iterator(Array& array, unsigned index) : item(array, index)

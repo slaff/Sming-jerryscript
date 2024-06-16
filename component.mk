@@ -137,6 +137,12 @@ endif
 
 JERRY_TYPES_H := $(COMPONENT_PATH)/src/include/Jerryscript/.typemaps.h
 
+ifeq ($(UNAME),Darwin)
+SED ?= gsed
+else
+SED ?= sed
+endif
+
 # Generate MAP #define for a jerryscript C enumeration
 # $1 -> e.g. JERRY_FUNCTION_TYPE_
 # $2 -> source file
@@ -145,7 +151,7 @@ define JerryGetTypes
 $(Q) printf "#define $(if $3,$3_,$1)MAP(XX)" >> $@
 $(Q) $(foreach v,\
 $(shell $(AWK) -F " |,|=" '/$1/ { sub(/^ +$1/,""); print $$1 }' $(JERRYSCRIPT_ROOT)/jerry-core/include/jerryscript-$2.h),\
-printf " \\\\\n\tXX($1$v, %s)" $$( echo "$v" | sed -E 's/(.*)/\L\1/; s/(^|_)([a-z0-9])/\U\2/g' ) >> $@; )
+printf " \\\\\n\tXX($1$v, %s)" $$( echo "$v" | $(SED) -E 's/(.*)/\L\1/; s/(^|_)([a-z0-9])/\U\2/g' ) >> $@; )
 $(Q) printf "\n\n" >> $@
 endef
 

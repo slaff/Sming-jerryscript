@@ -15,7 +15,7 @@
 #include <debug_progmem.h>
 
 extern "C" {
-#include <ecma/base/ecma-helpers.h>
+#include <jerry-core/ecma/base/ecma-helpers.h>
 }
 
 // Check Ecma values are correct

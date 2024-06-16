@@ -14,8 +14,8 @@
 
 #include "include/Jerryscript/Except.h"
 #include "include/Jerryscript/Context.h"
-#include <include/jerryscript-port.h>
-#include <include/jerryscript-core.h>
+#include <jerry-core/include/jerryscript-port.h>
+#include <jerry-core/include/jerryscript-core.h>
 #include "include/jerry_port_vm.h"
 #include <debug_progmem.h>
 #include <Platform/RTC.h>

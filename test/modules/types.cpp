@@ -1,5 +1,4 @@
 #include <JerryTest.h>
-#include <jcontext.h>
 
 namespace
 {

@@ -8,7 +8,6 @@
  */
 
 #include "include/Jerryscript/Debug.h"
-#include <jerryscript.h>
 #include <debug_progmem.h>
 
 namespace Jerryscript

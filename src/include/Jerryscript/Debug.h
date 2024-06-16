@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <include/jerryscript.h>
+#include <jerry-core/include/jerryscript.h>
 
 namespace Jerryscript
 {

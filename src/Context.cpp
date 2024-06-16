@@ -11,7 +11,6 @@
  */
 
 #include "include/Jerryscript/Context.h"
-#include <jerryscript.h>
 
 namespace Jerryscript
 {

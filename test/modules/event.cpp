@@ -1,8 +1,9 @@
 #include <JerryTest.h>
 
+IMPORT_FSTR_LOCAL(eventSnap, PROJECT_DIR "/out/jerryscript/event.js.snap")
+
 namespace
 {
-IMPORT_FSTR(eventSnap, PROJECT_DIR "/out/jerryscript/event.js.snap")
 DEFINE_FSTR(testEventName, "EVENT_TEMP")
 HashMap<String, Vector<JS::Callable>> events;
 

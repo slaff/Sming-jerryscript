@@ -17,7 +17,7 @@ using HeapStats = jerry_heap_stats_t;
 
 inline bool getHeapStats(HeapStats& stats)
 {
-	return jerry_get_memory_stats(&stats);
+	return jerry_heap_stats(&stats);
 }
 
 size_t getHeapUsed();

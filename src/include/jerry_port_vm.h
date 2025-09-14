@@ -57,6 +57,6 @@ __forceinline static bool jerry_port_watchdog_poll()
 	if(jerry_port_watchdog_read() < jerry_port_watchdog.period) {
 		return true;
 	}
-	jerry_fatal(ERR_WATCHDOG_TIMEOUT);
+	jerry_fatal(JERRY_FATAL_WATCHDOG_TIMEOUT);
 	return false;
 }

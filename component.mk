@@ -25,18 +25,16 @@ JERRY_GLOBAL_HEAP_SIZE ?= 1
 
 # Compact (minimal profile) compilation profile makes the JerryScript library smaller
 COMPONENT_VARS += JERRY_COMPACT_PROFILE
-JERRY_COMPACT_PROFILE ?= 1
+JERRY_COMPACT_PROFILE ?= 0
 
 ifeq ($(JERRY_COMPACT_PROFILE),1)
 JERRY_PROFILE := minimal
 # Apply these flags to library and tool(s)
 JERRY_COMPILER_FLAGS := \
 	JERRY_BUILTINS=0 \
-	JERRY_ESNEXT=0 \
 	JERRY_UNICODE_CASE_CONVERSION=0
 else
 JERRY_PROFILE := es.next
-GLOBAL_CFLAGS += -DJERRY_ESNEXT=1
 endif
 
 JERRY_WEB_COMPILER := $(COMPONENT_PATH)/jsc/$(JERRY_PROFILE)

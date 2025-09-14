@@ -30,25 +30,18 @@ void jerry_port_watchdog_set_period(uint32_t milliseconds)
 /**
  * Provide log message implementation for the engine.
  */
-void jerry_port_log(jerry_log_level_t level, /**< log level */
-					const char* format,		 /**< format string */
-					...)					 /**< parameters */
+void jerry_port_log(const char* msg)
 {
-	(void)level; /* ignore log level */
-
-	va_list args;
-	va_start(args, format);
-	m_vprintf(format, args);
-	va_end(args);
+	m_puts(msg);
 }
 
 /**
- * Default implementation of jerry_port_get_current_time.
+ * Default implementation of jerry_port_current_time.
  */
-double jerry_port_get_current_time()
+double jerry_port_current_time()
 {
 	return RTC.getRtcNanoseconds() / 1e9;
-} /* jerry_port_get_current_time */
+}
 
 /**
  * Default implementation of jerry_port_get_local_time_zone_adjustment. Uses the 'tm_gmtoff' field
@@ -61,7 +54,22 @@ double jerry_port_get_current_time()
 double jerry_port_get_local_time_zone_adjustment(double unix_ms, /**< ms since unix epoch */
 												 bool is_utc)	/**< is the time above in UTC? */
 {
+	// TODO
 	return 0.0;
+}
+
+/**
+ * Get the current system time in UTC.
+ *
+ * This port function is called by jerry-core when JERRY_BUILTIN_DATE is enabled.
+ * It can also be used in the implementing application to initialize the random number generator.
+ *
+ * @return milliseconds since Unix epoch
+ */
+int32_t jerry_port_local_tza(double unix_ms)
+{
+	// TODO
+	return 0;
 }
 
 /**
@@ -85,7 +93,16 @@ jerry_value_t jerry_port_module_resolve(const jerry_value_t specifier, /**< modu
 	(void)referrer;
 	(void)user_p;
 
-	return jerry_create_error(JERRY_ERROR_REFERENCE, nullptr);
+	return jerry_error(JERRY_ERROR_REFERENCE, {});
+}
+
+size_t jerry_port_context_alloc(size_t context_size)
+{
+	return context_size;
+}
+
+void jerry_port_context_free(void)
+{
 }
 
 /**
@@ -93,7 +110,14 @@ jerry_value_t jerry_port_module_resolve(const jerry_value_t specifier, /**< modu
  *
  * @return the pointer to the current context
  */
-jerry_context_t* jerry_port_get_current_context(void)
+jerry_context_t* jerry_port_context_get(void)
 {
 	return Jerryscript::Context::getCurrent();
+}
+
+/**
+ * Init the program
+ */
+void jerry_port_init(void)
+{
 }

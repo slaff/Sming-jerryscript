@@ -15,7 +15,7 @@ namespace Jerryscript
 bool printHeap()
 {
 	jerry_heap_stats_t stats;
-	if(!jerry_get_memory_stats(&stats)) {
+	if(!jerry_heap_stats(&stats)) {
 		m_printf(_F("[JS] Heap stats disabled"));
 		return false;
 	}

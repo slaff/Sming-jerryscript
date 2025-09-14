@@ -37,7 +37,7 @@ void cleanup();
  */
 inline bool isFeatureEnabled(Feature feature)
 {
-	return jerry_is_feature_enabled(jerry_feature_t(feature));
+	return jerry_feature_enabled(jerry_feature_t(feature));
 }
 
 namespace Watchdog
@@ -112,7 +112,7 @@ inline Value loadFromFile(const String& fileName)
  */
 inline void gc(bool maximumEffort = false)
 {
-	jerry_gc(maximumEffort ? JERRY_GC_PRESSURE_HIGH : JERRY_GC_PRESSURE_LOW);
+	jerry_heap_gc(maximumEffort ? JERRY_GC_PRESSURE_HIGH : JERRY_GC_PRESSURE_LOW);
 }
 
 } // namespace Jerryscript

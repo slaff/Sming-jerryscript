@@ -22,8 +22,7 @@ Context::Context() : Context(JERRY_GLOBAL_HEAP_SIZE * 1024)
 
 Context::Context(size_t heapSize)
 {
-	auto ctx = jerry_create_context(std::max(heapSize, size_t(1024U)), alloc, this);
-	context.reset(reinterpret_cast<uint8_t*>(ctx));
+	context = std::make_unique<uint8_t[]>(std::max(heapSize, size_t(1024U)));
 }
 
 void* Context::alloc(size_t size, void* param)

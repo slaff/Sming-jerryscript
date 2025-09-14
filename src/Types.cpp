@@ -101,8 +101,8 @@ Value::Value(unsigned value) : value(ecma_make_uint32_value(value))
 
 size_t Value::readString(unsigned offset, char* buffer, size_t length) const
 {
-	return jerry_substring_to_char_buffer(value, offset, offset + length, reinterpret_cast<jerry_char_t*>(buffer),
-										  length);
+	jerry_value_t substr = jerry_string_substr(value, offset, offset + length);
+	return jerry_string_to_buffer(substr, JERRY_ENCODING_UTF8, reinterpret_cast<jerry_char_t*>(buffer), length);
 }
 
 String Value::subString(unsigned offset, size_t length) const
@@ -127,20 +127,20 @@ Value::operator String() const
 		return nullptr;
 	}
 
-	jerry_size_t sz = jerry_get_string_size(strval.get());
+	jerry_size_t sz = jerry_string_size(strval.get(), JERRY_ENCODING_UTF8);
 	String s;
 	if(!s.setLength(sz)) {
 		return nullptr;
 	}
 
-	jerry_string_to_char_buffer(strval.get(), reinterpret_cast<jerry_char_t*>(s.begin()), sz);
+	jerry_string_to_buffer(strval.get(), JERRY_ENCODING_UTF8, reinterpret_cast<jerry_char_t*>(s.begin()), sz);
 
 	return s;
 }
 
 Array Object::keys() const
 {
-	return OwnedValue{jerry_get_object_keys(get())};
+	return OwnedValue{jerry_object_keys(get())};
 }
 
 Callable Object::getFunction(const String& name)
@@ -200,7 +200,7 @@ Value Object::runFunction(const String& name, std::initializer_list<Value> args)
 
 Value Error::message() const
 {
-	Object value = OwnedValue{jerry_get_value_from_error(get(), false)};
+	Object value = OwnedValue{jerry_throw_value(get(), false)};
 	return value[F("message")];
 }
 
@@ -229,14 +229,13 @@ Object Value::toObject() const
 Value Callable::call(const Object& thisValue, const Value& arg)
 {
 	jerry_port_watchdog_reset();
-	return OwnedValue{jerry_call_function(get(), thisValue.get(), &const_cast<Value&>(arg).get(), 1)};
+	return OwnedValue{jerry_call(get(), thisValue.get(), &const_cast<Value&>(arg).get(), 1)};
 }
 
 Value Callable::call(const Object& thisValue, std::initializer_list<Value> args)
 {
 	jerry_port_watchdog_reset();
-	return OwnedValue{
-		jerry_call_function(get(), thisValue.get(), args.size() ? &args.begin()->get() : nullptr, args.size())};
+	return OwnedValue{jerry_call(get(), thisValue.get(), args.size() ? &args.begin()->get() : nullptr, args.size())};
 }
 
 } // namespace Jerryscript

@@ -12,6 +12,7 @@
 
 #include "Types.h"
 #include <csetjmp>
+#include <jerry-core/include/jerryscript-port.h>
 
 namespace Jerryscript
 {

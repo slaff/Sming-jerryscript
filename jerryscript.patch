@@ -1,8 +1,8 @@
 diff --git a/jerry-core/parser/js/js-parser.c b/jerry-core/parser/js/js-parser.c
-index b55baed5..bd6b41da 100644
+index 8f241b6a..2734b2c5 100644
 --- a/jerry-core/parser/js/js-parser.c
 +++ b/jerry-core/parser/js/js-parser.c
-@@ -3356,12 +3356,9 @@ parser_parse_script (void *source_p, /**< source code */
+@@ -3360,12 +3360,8 @@ parser_parse_script (void *source_p, /**< source code */
  
    return bytecode_p;
  #else /* !JERRY_PARSER */
@@ -11,30 +11,15 @@ index b55baed5..bd6b41da 100644
    JERRY_UNUSED (source_p);
 -  JERRY_UNUSED (source_size);
    JERRY_UNUSED (parse_opts);
--  JERRY_UNUSED (resource_name);
-+  JERRY_UNUSED (options_p);
+-  JERRY_UNUSED (source_name);
  
    ecma_raise_syntax_error (ECMA_ERR_PARSER_NOT_SUPPORTED);
    return NULL;
-diff --git a/jerry-core/ecma/operations/ecma-eval.c b/jerry-core/ecma/operations/ecma-eval.c
-index e4a2d734..cd544844 100644
---- a/jerry-core/ecma/operations/ecma-eval.c
-+++ b/jerry-core/ecma/operations/ecma-eval.c
-@@ -94,8 +94,7 @@ ecma_op_eval_chars_buffer (void *source_p, /**< source code */
- 
-   return vm_run_eval (bytecode_p, parse_opts);
- #else /* !JERRY_PARSER */
--  JERRY_UNUSED (code_p);
--  JERRY_UNUSED (code_buffer_size);
-+  JERRY_UNUSED (source_p);
-   JERRY_UNUSED (parse_opts);
- 
-   return ecma_raise_syntax_error (ECMA_ERR_PARSER_NOT_SUPPORTED);
 diff --git a/jerry-core/ecma/base/ecma-helpers.c b/jerry-core/ecma/base/ecma-helpers.c
-index bd25d9d3..cce169bb 100644
+index c51be10d..151ec37a 100644
 --- a/jerry-core/ecma/base/ecma-helpers.c
 +++ b/jerry-core/ecma/base/ecma-helpers.c
-@@ -1626,11 +1626,13 @@ ecma_script_get_from_value (ecma_value_t value) /**< compiled code */
+@@ -1616,11 +1616,13 @@ ecma_script_get_from_value (ecma_value_t value) /**< compiled code */
        {
          ecma_extended_object_t *ext_object_p = (ecma_extended_object_t *) object_p;
  
@@ -49,27 +34,27 @@ index bd25d9d3..cce169bb 100644
  #if JERRY_MODULE_SYSTEM
          if (ext_object_p->u.cls.type == ECMA_OBJECT_CLASS_MODULE)
 diff --git a/jerry-core/api/jerryscript.c b/jerry-core/api/jerryscript.c
-index 13e3fd65..32444cd6 100644
+index d8174b92..1ceb0373 100644
 --- a/jerry-core/api/jerryscript.c
 +++ b/jerry-core/api/jerryscript.c
-@@ -564,10 +564,12 @@ jerry_run (const jerry_value_t func_val) /**< function to run */
+@@ -534,10 +534,12 @@ jerry_run (const jerry_value_t script) /**< script or module to run */
  
-   ecma_object_t *object_p = ecma_get_object_from_value (func_val);
+   ecma_object_t *object_p = ecma_get_object_from_value (script);
  
 +#if JERRY_PARSER
    if (!ecma_object_class_is (object_p, ECMA_OBJECT_CLASS_SCRIPT))
    {
-     return jerry_throw (ecma_raise_type_error (ECMA_ERR_WRONG_ARGS_MSG));
+     return jerry_throw_sz (JERRY_ERROR_TYPE, ecma_get_error_msg (ECMA_ERR_WRONG_ARGS_MSG));
    }
 +#endif
  
    ecma_extended_object_t *ext_object_p = (ecma_extended_object_t *) object_p;
  
 diff --git a/jerry-core/jmem/jmem-heap.c b/jerry-core/jmem/jmem-heap.c
-index 152909a6..200f61d7 100644
+index b7e60849..c3177506 100644
 --- a/jerry-core/jmem/jmem-heap.c
 +++ b/jerry-core/jmem/jmem-heap.c
-@@ -734,6 +734,7 @@ jmem_heap_get_stats (jmem_heap_stats_t *out_heap_stats_p) /**< [out] heap stats
+@@ -744,6 +744,7 @@ jmem_heap_get_stats (jmem_heap_stats_t *out_heap_stats_p) /**< [out] heap stats
  void
  jmem_heap_stats_print (void)
  {
@@ -77,19 +62,19 @@ index 152909a6..200f61d7 100644
    jmem_heap_stats_t *heap_stats = &JERRY_CONTEXT (jmem_heap_stats);
  
    JERRY_DEBUG_MSG ("Heap stats:\n");
-@@ -764,6 +765,7 @@ jmem_heap_stats_print (void)
-                    heap_stats->peak_object_bytes,
-                    heap_stats->property_bytes,
-                    heap_stats->peak_property_bytes);
+@@ -762,6 +763,7 @@ jmem_heap_stats_print (void)
+   JERRY_DEBUG_MSG ("  Peak allocated object data = %u bytes\n", (unsigned) heap_stats->peak_object_bytes);
+   JERRY_DEBUG_MSG ("  Allocated property data = %u bytes\n", (unsigned) heap_stats->property_bytes);
+   JERRY_DEBUG_MSG ("  Peak allocated property data = %u bytes\n", (unsigned) heap_stats->peak_property_bytes);
 +#endif
  } /* jmem_heap_stats_print */
  
  /**
 diff --git a/jerry-core/jrt/jrt.h b/jerry-core/jrt/jrt.h
-index ffd4bde3..dc0ee760 100644
+index 2c1f308d..8a760809 100644
 --- a/jerry-core/jrt/jrt.h
 +++ b/jerry-core/jrt/jrt.h
-@@ -24,6 +24,12 @@
+@@ -25,6 +25,12 @@
  #include "config.h"
  #include "jrt-types.h"
  
@@ -102,7 +87,7 @@ index ffd4bde3..dc0ee760 100644
  /*
   * Constants
   */
-@@ -78,14 +84,14 @@ void JERRY_ATTR_NORETURN jerry_unreachable (const char *file, const char *functi
+@@ -79,14 +85,14 @@ void JERRY_ATTR_NORETURN jerry_unreachable (const char *file, const char *functi
    {                                                         \
      if (JERRY_UNLIKELY (!(x)))                              \
      {                                                       \
@@ -119,43 +104,23 @@ index ffd4bde3..dc0ee760 100644
    } while (0)
  #else /* JERRY_NDEBUG */
  #define JERRY_ASSERT(x) \
-@@ -120,10 +126,10 @@ void JERRY_ATTR_NORETURN jerry_fatal (jerry_fatal_code_t code);
+@@ -124,10 +130,10 @@ void jerry_jrt_set_log_level (jerry_log_level_t level);
   * Logging
   */
  #if JERRY_LOGGING
--#define JERRY_ERROR_MSG(...)   jerry_port_log (JERRY_LOG_LEVEL_ERROR, __VA_ARGS__)
--#define JERRY_WARNING_MSG(...) jerry_port_log (JERRY_LOG_LEVEL_WARNING, __VA_ARGS__)
--#define JERRY_DEBUG_MSG(...)   jerry_port_log (JERRY_LOG_LEVEL_DEBUG, __VA_ARGS__)
--#define JERRY_TRACE_MSG(...)   jerry_port_log (JERRY_LOG_LEVEL_TRACE, __VA_ARGS__)
-+#define JERRY_ERROR_MSG(fmt, ...)   jerry_port_log (JERRY_LOG_LEVEL_ERROR, _F(fmt), ##__VA_ARGS__)
-+#define JERRY_WARNING_MSG(fmt, ...) jerry_port_log (JERRY_LOG_LEVEL_WARNING, _F(fmt), ##__VA_ARGS__)
-+#define JERRY_DEBUG_MSG(fmt, ...)   jerry_port_log (JERRY_LOG_LEVEL_DEBUG, _F(fmt), ##__VA_ARGS__)
-+#define JERRY_TRACE_MSG(fmt, ...)   jerry_port_log (JERRY_LOG_LEVEL_TRACE, _F(fmt), ##__VA_ARGS__)
+-#define JERRY_ERROR_MSG(...)   jerry_log (JERRY_LOG_LEVEL_ERROR, __VA_ARGS__)
+-#define JERRY_WARNING_MSG(...) jerry_log (JERRY_LOG_LEVEL_WARNING, __VA_ARGS__)
+-#define JERRY_DEBUG_MSG(...)   jerry_log (JERRY_LOG_LEVEL_DEBUG, __VA_ARGS__)
+-#define JERRY_TRACE_MSG(...)   jerry_log (JERRY_LOG_LEVEL_TRACE, __VA_ARGS__)
++#define JERRY_ERROR_MSG(fmt, ...)   jerry_log (JERRY_LOG_LEVEL_ERROR, _F(fmt), ##__VA_ARGS__)
++#define JERRY_WARNING_MSG(fmt, ...) jerry_log (JERRY_LOG_LEVEL_WARNING, _F(fmt), ##__VA_ARGS__)
++#define JERRY_DEBUG_MSG(fmt, ...)   jerry_log (JERRY_LOG_LEVEL_DEBUG, _F(fmt), ##__VA_ARGS__)
++#define JERRY_TRACE_MSG(fmt, ...)   jerry_log (JERRY_LOG_LEVEL_TRACE, _F(fmt), ##__VA_ARGS__)
  #else /* !JERRY_LOGGING */
  #define JERRY_ERROR_MSG(...)          \
    do                                  \
-diff --git a/jerry-core/api/jerry-snapshot.c b/jerry-core/api/jerry-snapshot.c
-index 19ec199f..fd578b2a 100644
---- a/jerry-core/api/jerry-snapshot.c
-+++ b/jerry-core/api/jerry-snapshot.c
-@@ -33,6 +33,7 @@
- 
- #if JERRY_SNAPSHOT_SAVE || JERRY_SNAPSHOT_EXEC
- 
-+#if JERRY_SNAPSHOT_SAVE
- /**
-  * Create an error object
-  *
-@@ -49,6 +50,7 @@ jerry_create_error_from_id (jerry_error_t error_type, /**< type of error */
- {
-   return jerry_create_error (error_type, (jerry_char_t *) ecma_get_error_utf8 (msg));
- } /* jerry_create_error_from_id */
-+#endif
- 
- /**
-  * Get snapshot configuration flags.
 diff --git a/jerry-core/vm/vm.c b/jerry-core/vm/vm.c
-index 13cbd7ec..28748935 100644
+index b6e1e88f..2ab657fe 100644
 --- a/jerry-core/vm/vm.c
 +++ b/jerry-core/vm/vm.c
 @@ -41,6 +41,12 @@
@@ -171,7 +136,7 @@ index 13cbd7ec..28748935 100644
  /** \addtogroup vm Virtual machine
   * @{
   *
-@@ -1023,7 +1029,7 @@ vm_loop (vm_frame_ctx_t *frame_ctx_p) /**< frame context */
+@@ -1018,7 +1024,7 @@ vm_loop (vm_frame_ctx_t *frame_ctx_p) /**< frame context */
    while (true)
    {
      /* Internal loop for byte code execution. */
@@ -181,21 +146,21 @@ index 13cbd7ec..28748935 100644
        const uint8_t *byte_code_start_p = byte_code_p;
        uint8_t opcode = *byte_code_p++;
 diff --git a/jerry-core/include/jerryscript-port.h b/jerry-core/include/jerryscript-port.h
-index 91bb3fe3..1f0f1d35 100644
+index e3187371..c522ec04 100644
 --- a/jerry-core/include/jerryscript-port.h
 +++ b/jerry-core/include/jerryscript-port.h
-@@ -48,7 +48,8 @@ typedef enum
-   ERR_REF_COUNT_LIMIT = 12,
-   ERR_DISABLED_BYTE_CODE = 13,
-   ERR_UNTERMINATED_GC_LOOPS = 14,
--  ERR_FAILED_INTERNAL_ASSERTION = 120
-+  ERR_FAILED_INTERNAL_ASSERTION = 120,
-+  ERR_WATCHDOG_TIMEOUT = 150, // Custom Sming code
+@@ -46,7 +46,8 @@ typedef enum
+   JERRY_FATAL_REF_COUNT_LIMIT = 12, /**< Reference count limit reached */
+   JERRY_FATAL_DISABLED_BYTE_CODE = 13, /**< Executed disabled instruction */
+   JERRY_FATAL_UNTERMINATED_GC_LOOPS = 14, /**< Garbage collection loop limit reached */
+-  JERRY_FATAL_FAILED_ASSERTION = 120 /**< Assertion failed */
++  JERRY_FATAL_FAILED_ASSERTION = 120, /**< Assertion failed */
++  JERRY_FATAL_WATCHDOG_TIMEOUT = 150, /**< Custom Sming code */
  } jerry_fatal_code_t;
  
  /**
 diff --git a/jerry-core/jrt/jrt-fatals.c b/jerry-core/jrt/jrt-fatals.c
-index 36c02277..94d0934f 100644
+index c2e09488..53e5e3fc 100644
 --- a/jerry-core/jrt/jrt-fatals.c
 +++ b/jerry-core/jrt/jrt-fatals.c
 @@ -29,7 +29,7 @@
@@ -206,17 +171,79 @@ index 36c02277..94d0934f 100644
 +#if 0
    switch (code)
    {
-     case ERR_OUT_OF_MEMORY:
-diff --git a/jerry-core/ecma/base/ecma-helpers-string.c b/jerry-core/ecma/base/ecma-helpers-string.c
-index 12770f36..5ab67df2 100644
---- a/jerry-core/ecma/base/ecma-helpers-string.c
-+++ b/jerry-core/ecma/base/ecma-helpers-string.c
-@@ -1835,7 +1835,7 @@ ecma_compare_ecma_strings_longpath (const ecma_string_t *string1_p, /**< ecma-st
-                                     const ecma_string_t *string2_p) /**< ecma-string */
- {
-   const lit_utf8_byte_t *utf8_string1_p, *utf8_string2_p;
--  lit_utf8_size_t string1_size_and_length[2], string2_size_and_length[2];
-+  lit_utf8_size_t string1_size_and_length[2]={0}, string2_size_and_length[2]={0};
+     case JERRY_FATAL_OUT_OF_MEMORY:
+diff --git a/.gitignore b/.gitignore
+index 3bb753c2..473e03e4 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -39,3 +39,4 @@ docs/doxygen
+ # Tests
+ tests/test262/
+ .vs
++out/
+diff --git a/jerry-port/win/jerry-port-win-process.c b/jerry-port/win/jerry-port-win-process.c
+index c567da8a..40f88d24 100644
+--- a/jerry-port/win/jerry-port-win-process.c
++++ b/jerry-port/win/jerry-port-win-process.c
+@@ -18,7 +18,7 @@
  
-   utf8_string1_p = ecma_compare_get_string_chars (string1_p, string1_size_and_length);
-   utf8_string2_p = ecma_compare_get_string_chars (string2_p, string2_size_and_length);
+ #include <windows.h>
+ 
+-#include <crtdbg.h>
++// #include <crtdbg.h>
+ #include <stdio.h>
+ 
+ void
+@@ -71,12 +71,12 @@ jerry_port_init (void)
+      * This is C runtime specific and thus the above incantations aren't
+      * sufficient to suppress these popups.
+      */
+-    _CrtSetReportMode (_CRT_ERROR, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG);
+-    _CrtSetReportFile (_CRT_ERROR, _CRTDBG_FILE_STDERR);
+-    _CrtSetReportMode (_CRT_ASSERT, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG);
+-    _CrtSetReportFile (_CRT_ASSERT, _CRTDBG_FILE_STDERR);
+-    _CrtSetReportMode (_CRT_WARN, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG);
+-    _CrtSetReportFile (_CRT_WARN, _CRTDBG_FILE_STDERR);
++    // _CrtSetReportMode (_CRT_ERROR, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG);
++    // _CrtSetReportFile (_CRT_ERROR, _CRTDBG_FILE_STDERR);
++    // _CrtSetReportMode (_CRT_ASSERT, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG);
++    // _CrtSetReportFile (_CRT_ASSERT, _CRTDBG_FILE_STDERR);
++    // _CrtSetReportMode (_CRT_WARN, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG);
++    // _CrtSetReportFile (_CRT_WARN, _CRTDBG_FILE_STDERR);
+   }
+ } /* jerry_port_init */
+ 
+diff --git a/jerry-core/ecma/builtin-objects/ecma-builtin-helpers.h b/jerry-core/ecma/builtin-objects/ecma-builtin-helpers.h
+index db90bc93..8810bf0c 100644
+--- a/jerry-core/ecma/builtin-objects/ecma-builtin-helpers.h
++++ b/jerry-core/ecma/builtin-objects/ecma-builtin-helpers.h
+@@ -175,8 +175,8 @@ typedef enum
+ } ecma_date_timezone_t;
+ 
+ /* ecma-builtin-helpers-date.c */
+-extern const char day_names_p[7][3];
+-extern const char month_names_p[12][3];
++extern const char day_names_p[7][4];
++extern const char month_names_p[12][4];
+ 
+ int32_t ecma_date_day_from_time (ecma_number_t time);
+ int32_t ecma_date_year_from_time (ecma_number_t time);
+diff --git a/jerry-core/ecma/builtin-objects/ecma-builtin-helpers-date.c b/jerry-core/ecma/builtin-objects/ecma-builtin-helpers-date.c
+index 280a94c4..fd5233b5 100644
+--- a/jerry-core/ecma/builtin-objects/ecma-builtin-helpers-date.c
++++ b/jerry-core/ecma/builtin-objects/ecma-builtin-helpers-date.c
+@@ -36,12 +36,12 @@
+ /**
+  * Day names
+  */
+-const char day_names_p[7][3] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
++const char day_names_p[7][4] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+ 
+ /**
+  * Month names
+  */
+-const char month_names_p[12][3] = {
++const char month_names_p[12][4] = {
+   "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+ };
+ 

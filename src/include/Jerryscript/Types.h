@@ -145,8 +145,8 @@ class Callable;
  *
  * IMPORTANT: When dealing with raw/native values, **ALWAYS** use either `OwnedValue` or `CopyValue` casts.
  * 
- *   - This is correct:  Value value = OwnedValue{jerry_create_object()};
- *   - This is wrong:    Value value = jerry_create_object(); // Ends up with memory leak plus garbage
+ *   - This is correct:  Value value = OwnedValue{jerry_object()};
+ *   - This is wrong:    Value value = jerry_object(); // Ends up with memory leak plus garbage
  *
  */
 class Value
@@ -171,7 +171,7 @@ public:
 	/**
 	 * @brief Construct a Value using a copy (or reference to) the given native value
 	 */
-	Value(const CopyValue& value) : value(jerry_acquire_value(value.value))
+	Value(const CopyValue& value) : value(jerry_value_copy(value.value))
 	{
 	}
 
@@ -224,28 +224,29 @@ public:
 	/**
 	 * @brief floating-point
 	 */
-	Value(double value) : value(jerry_create_number(value))
+	Value(double value) : value(jerry_number(value))
 	{
 	}
 
 	/**
 	 * @brief Boolean
 	 */
-	Value(bool value) : value(jerry_create_boolean(value))
+	Value(bool value) : value(jerry_boolean(value))
 	{
 	}
 
 	/**
 	 * @brief Wiring String
 	 */
-	Value(const String& s) : value(jerry_create_string_sz(reinterpret_cast<const jerry_char_t*>(s.c_str()), s.length()))
+	Value(const String& s)
+		: value(jerry_string(reinterpret_cast<const jerry_char_t*>(s.c_str()), s.length(), JERRY_ENCODING_UTF8))
 	{
 	}
 
 	/**
 	 * @brief NUL-terminated 'C' string
 	 */
-	Value(const char* s) : value(jerry_create_string(reinterpret_cast<const jerry_char_t*>(s)))
+	Value(const char* s) : value(jerry_string_sz(s))
 	{
 	}
 
@@ -289,7 +290,7 @@ public:
 	Value& reset(jerry_value_t value = jerry_value_t(Ecma::VALUE_EMPTY))
 	{
 		if(!isEmpty()) {
-			jerry_release_value(this->value);
+			jerry_value_free(this->value);
 		}
 		this->value = value;
 		return *this;
@@ -436,7 +437,7 @@ public:
 	 */
 	Type type() const
 	{
-		return Type(jerry_value_get_type(value));
+		return Type(jerry_value_type(value));
 	}
 
 	/**
@@ -497,12 +498,12 @@ public:
 
 		operator float() const
 		{
-			return jerry_get_number_value(v.get());
+			return jerry_value_as_number(v.get());
 		}
 
 		operator double() const
 		{
-			return jerry_get_number_value(v.get());
+			return jerry_value_as_number(v.get());
 		}
 
 		operator String() const
@@ -538,7 +539,7 @@ private:
 class ExternalFunction : public Value
 {
 public:
-	ExternalFunction(jerry_external_handler_t handler) : Value(OwnedValue{jerry_create_external_function(handler)})
+	ExternalFunction(jerry_external_handler_t handler) : Value(OwnedValue{jerry_function_external(handler)})
 	{
 	}
 };
@@ -593,7 +594,7 @@ public:
 	/**
 	 * @brief Default constructor creates a new, empty object
 	 */
-	Object() : Value(OwnedValue{jerry_create_object()})
+	Object() : Value(OwnedValue{jerry_object()})
 	{
 	}
 
@@ -634,7 +635,7 @@ public:
 	 */
 	Value setProperty(const Value& name, const Value& value)
 	{
-		return OwnedValue{jerry_set_property(get(), name.get(), value.get())};
+		return OwnedValue{jerry_object_set(get(), name.get(), value.get())};
 	}
 
 	/**
@@ -644,7 +645,7 @@ public:
 	 */
 	Value getProperty(const Value& name) const
 	{
-		return OwnedValue{jerry_get_property(get(), name.get())};
+		return OwnedValue{jerry_object_get(get(), name.get())};
 	}
 
 	/**
@@ -654,7 +655,7 @@ public:
 	 */
 	bool hasProperty(const Value& name) const
 	{
-		return jerry_has_property(get(), name.get());
+		return jerry_object_has(get(), name.get());
 	}
 
 	/**
@@ -664,7 +665,7 @@ public:
 	 */
 	bool removeProperty(const Value& name)
 	{
-		return jerry_delete_property(get(), name.get());
+		return jerry_object_delete(get(), name.get());
 	}
 	/** @} */
 
@@ -733,7 +734,7 @@ public:
 	/**
 	 * @brief Error with type only
 	 */
-	Error(ErrorType type) : Value(OwnedValue{jerry_create_error_sz(jerry_error_t(type), nullptr, 0)})
+	Error(ErrorType type) : Value(OwnedValue{jerry_error_sz(jerry_error_t(type), nullptr)})
 	{
 	}
 
@@ -741,8 +742,7 @@ public:
 	 * @brief Error with type and message
 	 */
 	Error(ErrorType type, const String& message)
-		: Value(OwnedValue{jerry_create_error_sz(
-			  jerry_error_t(type), reinterpret_cast<const jerry_char_t*>(message.c_str()), message.length())})
+		: Value(OwnedValue{jerry_error_sz(jerry_error_t(type), message.c_str())})
 	{
 	}
 	/** @} */
@@ -766,7 +766,7 @@ public:
 	 */
 	ErrorType errorType() const
 	{
-		return ErrorType(jerry_get_error_type(get()));
+		return ErrorType(jerry_error_type(get()));
 	}
 
 	/**
@@ -909,7 +909,7 @@ public:
 	/**
 	 * @brief Create a new, fixed-size array with the given number of elements
 	 */
-	Array(size_t size) : Object(OwnedValue{jerry_create_array(size)})
+	Array(size_t size) : Object(OwnedValue{jerry_array(size)})
 	{
 	}
 
@@ -918,7 +918,7 @@ public:
 	 */
 	size_t count() const
 	{
-		return jerry_get_array_length(get());
+		return jerry_array_length(get());
 	}
 
 	/**
@@ -967,7 +967,7 @@ public:
 	 */
 	Value getProperty(unsigned index) const
 	{
-		return OwnedValue{jerry_get_property_by_index(get(), index)};
+		return OwnedValue{jerry_object_get_index(get(), index)};
 	}
 
 	/**
@@ -978,7 +978,7 @@ public:
 	 */
 	Value setProperty(unsigned index, const Value& value)
 	{
-		return OwnedValue{jerry_set_property_by_index(get(), index, value.get())};
+		return OwnedValue{jerry_object_set_index(get(), index, value.get())};
 	}
 	/** @} */
 };
@@ -1010,7 +1010,7 @@ public:
 	 */
 	FunctionType functionType() const
 	{
-		return FunctionType(jerry_function_get_type(get()));
+		return FunctionType(jerry_function_type(get()));
 	}
 };
 
@@ -1019,7 +1019,7 @@ public:
  */
 inline Object global()
 {
-	return OwnedValue{jerry_get_global_object()};
+	return OwnedValue{jerry_current_realm()};
 }
 
 } // namespace Jerryscript

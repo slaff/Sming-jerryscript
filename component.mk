@@ -94,6 +94,9 @@ JERRY_CMAKE_PARAMS := \
 	--compile-flag "-I $(JERRYSCRIPT_ROOT)/../src/include" \
 	--compile-flag "-Wno-error=unused-parameter " \
 	--compile-flag "-D_POSIX_C_SOURCE=1 -U__STRICT_ANSI__"
+else ifeq ($(UNAME),Darwin)
+JERRY_CMAKE_PARAMS := \
+	--compile-flag "-Wno-enum-enum-conversion "
 endif
 
 $(JERRY_SNAPSHOT_TOOL):
